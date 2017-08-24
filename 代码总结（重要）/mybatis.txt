@@ -1,0 +1,102 @@
+﻿	
+	//resultMap映射使用方法
+	<resultMap type="com.lw.modules.tbaproduct.entity.TBaProduct" id="tbaproduct">
+    	<id column="id" property="id"/>
+    	<result column="parent_id" property="parent.id"/>
+    	<result column="parent_ids" property="parentIds"/>
+    	<result column="name" property="name"/>
+    	<result column="code" property="code"/>
+ 	 </resultMap>
+	
+	<select id="findSecGra" resultType="tbaproduct" parameterType="string">
+		select * from T_BA_PRODUCT where length(code)=${"4"}
+		<if test="proFirstSelect != null and proFirstSelect !=''">
+			and code like CONCAT(#{proFirstSelect},'%')
+		</if>
+	</select>
+
+	//Map集合传多个参数示例
+	<select id="findAreaIndex" resultType="TBzArea" parameterType="java.util.Map">
+		SELECT * FROM(SELECT
+			<include refid="tBzAreaColumns"/>,rownum num 
+		FROM t_bz_area a
+		<include refid="tBzAreaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}			
+		</where>			
+				ORDER BY a.update_date DESC		)
+				where num &lt;= #{num}
+		<if test="type != null and type !=''">
+            AND a.type = #{type}
+        </if>
+	</select>
+	//实体类中包含实体对象属性sql语句（TBzArea实体类中有office对象，表字段office_id-->office对象.id)
+	 <select id="getOfficeAreaList" resultType="TBzArea">
+	    select a.id AS "id", 
+	    a.demo_name,
+		a.office_id as "office.id",
+		a.del_flag AS "delFlag" 
+		FROM t_bz_area a 
+		<where>
+		a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+
+
+selectUser(@Param(“userName”)String name,@Param(“userArea”)String area);
+
+
+<select id="selectUser"  resultMap="BaseResultMap">
+
+   select *  from user_user_t   where user_name = #{userName，jdbcType=VARCHAR}
+and
+user_area=#{userArea,jdbcType=VARCHAR}
+
+</select> 
+
+
+public List<XXXBean> getXXXBeanList(String xxId, String xxCode);  
+
+<select id="getXXXBeanList" resultType="XXBean">
+
+　　select t.* from tableName where id = #{0} and name = #{1}  
+
+</select>  
+
+由于是多参数那么就不能使用parameterType， 改用#｛index｝是第几个就用第几个的索引，索引从0开始
+
+    public Integer existTable(@Param("tableName") String tableName);
+
+
+
+
+
+oracle mybatis的like写法
+and b.facname like '%'||#{certList.facname}||'%' 
+
+//时间
+ <if test = "beginDate !=null and beginDate !='' and endDate !=null and endDate !='' ">	
+	and	ca.create_date BETWEEN #{beginDate} AND #{endDate}
+	</if>
+	<if test = "beginDate !=null and beginDate !='' and endDate ==null  ">	
+	and	 ca.create_date BETWEEN #{beginDate} AND #{beginDate}
+	</if>
+	<if test = "beginDate ==null  and endDate !=null and endDate !='' ">	
+	and	ca.create_date BETWEEN #{endDate} AND #{endDate}
+	</if>
+
+
+//rownum cdata
+<select id="findTenList" resultType="TBzQueryStaff">
+	select * from (SELECT 
+			<include refid="tBzQueryStaffColumns"/>
+		FROM t_bz_query_staff a
+		<include refid="tBzQueryStaffJoins"/>
+		<where>1=1
+			<if test="code != null and code != ''">
+				and a.code = #{code}
+			</if>
+		</where>
+			order by a.create_date desc)where  ROWNUM <![CDATA[<= 10]]>
+	</select>

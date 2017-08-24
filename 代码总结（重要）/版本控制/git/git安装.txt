@@ -1,0 +1,26 @@
+一.准备工作（可能缺少，到时候自己斟酌）
+	yum install gcc 
+	yum install expat-devel 
+	yum install perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker
+	yum install libcurl-dev libcurl-devel  
+1.复制后解压
+	tar zxvf git.2.13.tar.gz
+2.编译
+	make prefix=/home/common/git all
+3.安装
+	make prefix=/home/common/git install
+4.配置环境变量
+	vim /etc/profile
+	export PATH=/home/common/git/bin:$PATH ===> (PATH=$JAVA_HOME/bin:/home/common/git/bin:$PATH)
+5.保存让其生效
+	source /etc/profile
+6.测试
+	直接git命令
+7.创建git仓库
+	cd git
+	mkdir gitrepo
+	mkdir project1
+	cd project1
+	创建仓库命令:
+		git init --bare
+8.K		

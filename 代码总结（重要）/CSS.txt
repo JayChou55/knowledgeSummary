@@ -1,0 +1,10 @@
+//table下td样式
+<style>
+ 	.table td{
+ 		vertical-align:middle;
+ 		text-align:center;
+ 		}
+</style>
+
+//类选择后的角标选择
+$(".select2-chosen").eq(1).text("-请选择-");

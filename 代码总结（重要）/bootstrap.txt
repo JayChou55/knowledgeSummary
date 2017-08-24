@@ -1,0 +1,13 @@
+//悬浮对话框
+
+$(function () { $("[data-toggle='popover']").popover(); })
+
+
+<a href="javascript:void(0);" data-toggle="popover" data-placement="bottom" data-content="
+		                    		<div style='width:250px;'>技术服务:025-52850163
+					                    <br/>
+					                    	商务合作： 010-65994168-8318
+					                    </br>
+		                    		</div>">
+		                    		联系我们
+		                    	</a>

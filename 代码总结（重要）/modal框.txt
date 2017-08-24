@@ -1,0 +1,9 @@
+	
+		$("button[name='button']").click(function(){
+			var certno=	$(this).parents("tr").find("input[name='certnum']").val();
+			/* alert(certno) */
+			
+			$("#iframe").attr("src","${ctx }/ts/cert/certProdList/changeUsedPt?certnum="+certno);	
+	/* 	alert($("#iframe").attr("src")); */
+		
+		});

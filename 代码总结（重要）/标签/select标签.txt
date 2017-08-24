@@ -1,0 +1,6 @@
+//查找值为指定情况下的选项选中
+$("#prodLabelUnit").find("option[value='"+data.packUnit+"']").attr("selected","selected");
+//获取选中的select的文本			 	
+$(".select2-chosen").eq(1).text($("#prodLabelUnit").find("option:selected").text());
+				 		 
+				 		

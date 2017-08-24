@@ -1,0 +1,2 @@
+<c:set var="salary" scope="session" value="{{row.type}}"/>
+<c:out value="${salary}"/>

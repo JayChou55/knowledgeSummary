@@ -1,0 +1,3 @@
+${fns:abbr(demandSpec.tBaRe.name,26)}
+
+<fmt:formatDate value ="${demandSpec.createDate}" pattern="yyyy-MM-dd"/>

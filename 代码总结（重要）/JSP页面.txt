@@ -1,0 +1,11 @@
+	//当前页面当前行数据
+ 			var ptname=	$(this).parents("tr").find("input[name='ptname']").val();
+			var certnum = $(this).parents("tr").find("input[name='certnum']").val();
+
+//直接获取父页面操作
+
+//商品页面绑定证书的序号
+			var certIndex = parent.$("#certProdListSize").val();（parent.xxxxx)
+
+//返回上一页面
+<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>

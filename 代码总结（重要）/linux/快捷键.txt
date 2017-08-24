@@ -1,0 +1,4 @@
+//命令行时终止
+ctrl+c，ctrl+d==exit;
+//复制
+cp aa /opt/bb (bb为复制文件夹名)

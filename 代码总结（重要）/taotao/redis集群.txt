@@ -1,0 +1,47 @@
+第一部分：准备
+1.创建redis-cluster目录
+	mkdir redis-cluster
+2.复制redis/bin/ 到redis-cluster/redis01下
+	cp -r redis/bin/ redis-cluster/redis01
+3.删除redis01下的dump.rdb
+	rm -rf dump.rdb
+4.修改redis.conf端口号
+	vim redis.conf (port：如7001)
+	cluster-enabled yes
+5.复制redis01
+	cp -r redis01/ redis02 ....
+6.建立一个启动日志
+	vim start-all.sh
+	内容：cd redis01
+	./redis-server redis.conf
+	cd ..
+	cd redis02
+	./redis-server redis.conf
+	cd ..
+	cd redis03
+	./redis-server redis.conf
+	cd ..
+	cd redis04
+	./redis-server redis.conf
+	cd ..
+	cd redis05
+	./redis-server redis.conf
+	cd ..
+	cd redis06
+	./redis-server redis.conf
+	cd ..
+7.修改为可启动文件
+	chmod +x start-all.sh
+8.启动
+	start-all.sh start
+9.查看启动
+	ps|aux grep redis
+
+
+第二部分：redis集群搭建
+1.安装ruby
+	yum install ruby
+2.安装redis-3.0.0.gem
+	gem install redis-3.0.0.gem
+3.复制redis-3.0.0文件夹下src内脚本redis-trib.rb到redis-cluster文件夹下
+	cp *.rb /home/shop/redis-cluster/（1、2步是启动redis-trib.rb的前提）

@@ -1,0 +1,1 @@
+mkdir /home/common/git -p     //递归创建目录

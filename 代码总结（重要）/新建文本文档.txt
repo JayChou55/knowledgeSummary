@@ -1,0 +1,27 @@
+867795228777@qq.com
+
+select * from (SELECT   a.id AS "id",   a.NAME AS "companyName",  wm_concat(distinct ps.COMM_NAME) AS "productName",   a.CONTACTER AS "connact",  a.phone AS "phone"   
+FROM T_BA_REGISTERED a      
+left join T_BZ_ENT_PRO_SPEC ps  on a.user_id=ps.CREATE_BY group by a.id ,a.name,a.CREATE_DATE,ps.by_type_id,a.CONTACTER ,  a.phone );
+
+
+
+
+select ps.comm_name ,(select p.name||'>'||(select p.name from t_ba_product p where p.id=(select substr(ps.product_type,1,4)
+from t_bz_ent_pro_spec ps where ps.id='08c296d52f70476aacabb164a476978d')) 
+from t_ba_product p where p.id=(select substr(ps.product_type,1,2)
+from t_bz_ent_pro_spec ps where ps.id='08c296d52f70476aacabb164a476978d')) AS "productType",a.name, c.cert_code from t_bz_ent_pro_spec ps , t_ba_registered a, t_bz_ent_cert_product cp, t_bz_cert c
+where a.user_id=ps.create_by 
+and ps.cert_pro_id=cp.id
+and c.id=cp.cert_id;
+
+
+
+select NAME,ID,wm_concat(distinct productType) productType,wm_concat(distinct Product_Name) productName,wm_concat(distinct COMM_NAME) commName from (
+select T001.NAME,T001.ID,
+(select p.name from t_ba_product p where p.Code=substr(T002.PRODUCT_TYPE,0,2)) productType,
+ T002.Product_Name,T002.COMM_NAME
+ from t_ba_registered T001,T_BZ_ENT_PRO_SPEC T002 
+where T001.User_Id=T002.Create_By(+) and T001.Aera_Office_Id='1a1077505b31410aa3ed57b8e2c5b0bd' 
+)
+group by NAME,ID

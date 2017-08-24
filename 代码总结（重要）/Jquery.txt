@@ -1,0 +1,249 @@
+	 
+//input的name选择,each并控制其属性
+$("input[name='tBzAreaDetail.type']").each(function(i,n){
+		 	 	var index=i+1
+    			if(str.indexOf(index.toString())>=0){
+	//也可以$(n)，直接n是js对象，加$转成jquery对象
+    			$(this).attr("checked","checked");
+
+    			}
+			}); 
+//checkbox单选			
+	$("#traceType2").click(function(){
+				if($("#traceType1").is(":checked")){
+					$("#traceType1").attr("checked",false);
+					
+				}else{
+					$("#traceType2").attr("checked",true);
+					
+				}									
+			});
+		$("#traceType1").click(function(){
+			if($("#traceType2").is(":checked")){
+				$("#traceType2").attr("checked",false);
+			}else{
+			
+				$("#traceType1").attr("checked",true);
+			}
+		
+		
+		
+		});
+
+//模态框
+
+<button id="findCert" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">选择</button>
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;width:800px;">
+		   <div class="modal-dialog">
+		      <div class="modal-content">
+		         <div class="modal-body">
+		        	<iframe id="midFrame" src="${ctx}/ent/tBzEntCertProduct/" style="width:100%; height:350px"
+					frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"></iframe>
+		         </div>
+      		</div>
+		</div>
+	</div>
+
+
+//模态框关闭
+parent.$("#certProdListModal").hide();
+			parent.location.reload();			
+
+
+//select初始加载
+<select id="selectProThr"  name="selectProThr" style='width:100px' name="productType" class="input-xlarge required selectProThr">
+				<option value="" >
+					--请选择--
+				</option>
+			<c:forEach items="${proThrList}" var="thrList">
+				<option value="${thrList.code}" <c:if test="${thrList.name ==select3.name}"> selected="selected"</c:if> >
+						${thrList.name}
+				</option>	
+			</c:forEach>
+</select>
+
+
+//Jquery Vaildate验证hidden标签
+$("#form1").validate({
+    ignore: "",
+    rules: {
+        something: {
+            number:true,
+            min:1,
+            required:true
+        }
+    }
+});
+
+//jquery vaildate下错误插入以及图片上传验证
+if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					}else if(element.is($("input[name='imgid']"))){
+
+					error.insertAfter($("#fileSpanimgid"));
+					
+					}else {
+						error.insertAfter(element);
+					}
+	
+		$("#filesampleDrawing").click(function(){	
+			   $("label[for='sampleDrawing']").remove();
+		});
+		
+		
+			jQuery.validator.addMethod("haveFileId", 
+                function(value, element) {          
+	                if($("input[name='sampleDrawing']").val()==""){
+	               		
+	                	return false;
+	                
+	                }else{
+	                $("label[for='sampleDrawing']").remove();
+	               		return true;
+	                }
+	             }, 
+         		"请上传商品图片"
+            );
+//select标签选择属性选择第一个下拉框	
+$("select").eq(1).prop('selectedIndex', 0);
+
+
+//a标签取值
+$("#aId").attr("valuer");
+
+
+//属性方面
+jquery给元素添加样式表的方法
+
+//1、获取和设置样式
+
+$("#tow").attr("class")获取ID为tow的class属性
+
+$("#two").attr("class","divClass")设置Id为two的class属性。
+
+//2、追加样式
+
+$("#two").addClass("divClass2")为ID为two的对象追加样式divClass2
+
+//3、移除样式
+
+$("#two").removeClass("divClass")移除 ID为two的对象的class名为divClass的样式。
+
+$(#two).removeClass("divClass divClass2")移除多个样式。
+
+//4、切换类名
+
+$("#two").toggleClass("anotherClass") //重复切换anotherClass样式
+
+//5、判断是否含有某项样式
+
+$("#two").hasClass("another")==$("#two").is(".another");
+
+//6、获取css样式中的样式
+
+$("div").css("color") 设置color属性值. $(element).css(style)
+
+//设置单个样式
+
+$("div").css("color","red")
+
+//设置多个样式
+
+$("div").css({fontSize:"30px",color:"red"})
+
+$("div").css("height","30px")==$("div").height("30px")
+
+$("div").css("width","30px")==$("div").height("30px")
+
+//7.offset()方法
+
+//它的作用是获取元素在当前视窗的相对偏移，其中返回对象包含两个属性,即top和left 。
+
+//注意：只对可见元素有效。
+
+var offset=$("div").offset();
+
+var left=offset.left;         //获取左偏移
+
+var top=offset.top;        //获取右偏移
+
+//8、position()方法
+
+//它的作用是获取元素相对于最近的一个position样式属性设置为relative或者absolute的祖父节点的相对偏移，与offset()一样，它返回的对象也包括两个属性即top和left。
+
+//9、scrollTop()方法和scrollLeft()方法
+
+$("div").scrollTop();        //获取元素的滚动条距顶端的距离。
+
+$("div").scrollLeft();         //获取元素的滚动条距左侧的距离。
+
+//10、jQuery中的 toggle和slideToggle 方法，都可以实现对一个元素的显示和隐藏。区别是：
+
+//toggle：动态效果为从右至左。横向动作。
+
+//slideToggle：动态效果从下至上。竖向动作。
+
+//比如想实现一个树由下至上收缩的动态效果，就使用slideToggle就ok了。
+
+$('input').attr("readonly",true)//将input元素设置为readonly
+$('input').attr("readonly",false)//去除input元素的readonly属性
+$('input').attr("disabled",true)//将input元素设置为disabled
+$('input').attr("disabled",false)//去除input元素的disabled属性
+
+
+//查找tr
+var ptname=$(this).parents("tr").find("input[name='ptname']").val();
+
+//通过css是否展现标签
+	$("#turnDown").css("display","none");
+	$("#turnDown").css("display","");
+//each function遍历
+
+		
+		var checkbox = $("input[type='checkbox']");
+			checkbox.each(function(i,n){
+			
+			alert($(n).attr("name"));
+			
+			});	
+
+//jquery 的children，获取的是当前元素下的下级儿子个元素，不包含孙子
+
+$("h4.panel-title").children().attr("name","collapseA")
+   $("a[name='collapseA']").click(function(){
+
+       $("div[name='certCollapse']").each(function(i,n){
+
+            $(n).removeClass();
+           $(n).addClass("panel-collapse collapse ");
+
+       })
+
+
+   });
+
+//生成一个input标签   
+   $(function(){
+$("<input>",{
+type:'text',
+val:'text',
+function:function(){
+$(this).addClass('active');
+},
+focusout:function(){
+$(this).removeClass('active');
+}
+}).appendTo("div");
+}
+
+
+//绑定未来元素（如：拼接的标签获取jquery对象）
+拼接出的ID为checkAll的checkBox
+	$(document).on("click","#checkAll",function(){
+	  
+		$('input[name="checkbox"]').attr("checked",this.checked);
+	});
+	
+//拼接的未来元素，方法无法触发只能用on，而属性可以直接获取	
+ 

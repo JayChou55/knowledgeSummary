@@ -1,0 +1,110 @@
+﻿一、安装前环境配置
+				nginx是C语言开发，建议在linux上运行，本教程使用Centos6.5作为安装环境。
+			gcc
+			安装nginx需要先将官网下载的源码进行编译，编译依赖gcc环境，如果没有gcc环境，需要安装gcc：yum install gcc-c++ 
+			PCRE
+			PCRE(Perl Compatible Regular Expressions)是一个Perl库，包括 perl 兼容的正则表达式库。nginx的http模块使用pcre来解析正则表达式，所以需要在linux上安装pcre库。
+		yum install -y pcre pcre-devel
+		注：pcre-devel是使用pcre开发的一个二次开发库。nginx也需要此库。
+			zlib
+			zlib库提供了很多种压缩和解压缩的方式，nginx使用zlib对http包的内容进行gzip，所以需要在linux上安装zlib库。
+		yum install -y zlib zlib-devel
+
+			openssl
+			OpenSSL 是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。
+			nginx不仅支持http协议，还支持https（即在ssl协议上传输http），所以需要在linux安装openssl库。
+		yum install -y openssl openssl-devel
+
+1.解压
+	tar zxf nginx
+2.输入如下命令，生成Makefile，用来编译
+	./configure \
+	--prefix=/usr/local/nginx \
+	--pid-path=/var/run/nginx/nginx.pid \
+	--lock-path=/var/lock/nginx.lock \
+	--error-log-path=/var/log/nginx/error.log \
+	--http-log-path=/var/log/nginx/access.log \
+	--with-http_gzip_static_module \
+	--http-client-body-temp-path=/var/temp/nginx/client \
+	--http-proxy-temp-path=/var/temp/nginx/proxy \
+	--http-fastcgi-temp-path=/var/temp/nginx/fastcgi \
+	--http-uwsgi-temp-path=/var/temp/nginx/uwsgi \
+	--http-scgi-temp-path=/var/temp/nginx/scgi
+3.make编译
+	make
+4.进入ngnix目录启动
+	cd/sbin
+	./ngnix
+5.启动报错
+	错误：创建对应目录
+		mkdir /var/temp/nginx -p 按层级创建
+	错误："/var/run/nginx/nginx.pid" failed (2: No such file or directory)
+		执行./nginx启动nginx，这里可以-c指定加载的nginx配置文件，如下：
+		./nginx -c /usr/local/nginx/conf/nginx.conf（放开pid        logs/nginx.pid;并创建对应logs文件夹）
+
+6.查看进程	
+	root      10910  0.0  0.0  24348   764 ?        Ss   16:35   0:00 nginx: master process ./nginx
+	nobody    10912  0.0  0.0  26860  1520 ?        S    16:35   0:00 nginx: worker process
+	root      10916  0.0  0.0 112648   960 pts/0    R+   16:35   0:00 grep --color=auto nginx
+7.关闭
+	./ngins -s stop    或者kill 10910
+	暴力关闭kill 9
+8.重新刷新配置文件	
+	./nginx -s reload	
+	
+二、通过端口控制区分虚拟主机
+1.修改conf
+		shift+v(V)进入行选模式
+		上下移动
+		y复制
+		p粘贴
+	复制server 	
+三、通过域名区分虚拟主机		
+		修改hosts
+	
+四、nginx反向代理	
+1.复制tomcat01、02
+		修改conf/server.xml端口号区分
+2.通过不同域名访问不同端口的反向代理服务器
+	注意80端口号的问题！
+	修改/nginx/conf/nginx.conf
+	
+	upstream tomcat1{
+		server 192.168.134.130:8080;
+	}
+	upstream tomcat2{
+		server 192.168.134.130:8081;
+	}
+
+	server {
+		listen       80;
+		server_name  www.mytest1.com;
+
+		#charset koi8-r;
+
+		#access_log  logs/host.access.log  main;
+
+		location / {
+		    proxy_pass  http://tomcat1;
+		    index  index.html index.htm;
+		}
+	server {
+		listen       80;
+		server_name  www.mytest2.com;
+
+		#charset koi8-r;
+
+		#access_log  logs/host.access.log  main;
+
+		location / {
+		    proxy_pass  http://tomcat2;
+		    index  index.html index.htm;
+		}
+		
+五、负载均衡
+	1.轮询，weight:权重
+		upstream tomcat1{
+			server 192.168.134.130:8080 weight:1;
+			server 192.168.134.130:8080 weight:2;
+	}	
+		

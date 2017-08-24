@@ -1,0 +1,2 @@
+//java后台获取webroot下文件内容("upload")指文件夹
+request.getSession().getServletContext().getRealPath("upload");

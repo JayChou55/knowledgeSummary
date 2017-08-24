@@ -1,0 +1,2 @@
+前台首页顶端内容：oda\WebRoot\WEB-INF\views\modules\cms\front\themes\basic\layouts\default.jsp
+后台顶端内容：\oda\WebRoot\WEB-INF\views\modules\sys\sysIndex.jsp

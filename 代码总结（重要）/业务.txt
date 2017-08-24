@@ -1,0 +1,27 @@
+﻿示范区企业：注册企业
+示范区用户：示范区监管部门
+平台用户
+系统管理员
+
+
+注册：
+	企业用户注册(1.操作注册表T_BA_REGISTERED注册表
+				 2.sys_user表(对应有用户类型(平台用户,示范区用户等)和示范区id) 1
+				 3.T_BZ_CERT证书表)
+				 
+					-->填写组织机构代码(对应下的证书内容添加至T_BZ_CERT表中);
+										-->拿到对应证书，添加证书下产品 至T_BZ_ENT_CERT_PRODUCT产品证书表中
+	T_BA_REGISTERED注册表
+	SYS_USER表
+	T_BZ_CERT证书表
+	T_BZ_ENT_CERT_PRODUCT产品证书表
+
+企业下：功能导航
+				--证书查询模块T_BZ_CERT（根据createBy查询，产品和证书关系貌似一对一）
+				--商品管理模块T_BZ_ENT_PRO_SPEC（）
+				--企业信息T_BA_REGISTERED
+				--企业资质T_BZ_ENT_ATTACHMENT
+				--供应商T_BZ_ENT_SUPPLIER
+				--销售渠道T_BZ_ENT_CHANNEL
+				
+			

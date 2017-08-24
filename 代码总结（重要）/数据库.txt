@@ -1,0 +1,108 @@
+select * from A
+innerjoin B 
+on A.aID = B.bID
+
+结果如下:
+aID　　　　　aNum　　　　　bID　　　　　bName
+1　　　　　a20050111　　　　1　　　　　2006032401
+2　　　　　a20050112　　　　2　　　　　2006032402
+3　　　　　a20050113　　　　3　　　　　2006032403
+4　　　　　a20050114　　　　4　　　　　2006032404
+
+
+select * from A
+left join B 
+on A.aID = B.bID
+
+结果如下:
+aID　　　　　aNum　　　　　bID　　　　　bName
+1　　　　　a20050111　　　　1　　　　　2006032401
+2　　　　　a20050112　　　　2　　　　　2006032402
+3　　　　　a20050113　　　　3　　　　　2006032403
+4　　　　　a20050114　　　　4　　　　　2006032404
+5　　　　　a20050115　　　　NULL　　　　　NULL
+
+
+
+横列转换
+select A.years,A.SUM1,B.SUM2 from    
+  (select * from (
+    select sum(decode(to_char(rdate,'mm'),'01',nums,0)) 一月,sum(decode(to_char(rdate,'mm'),'02',nums,0)) 二月,
+       sum(decode(to_char(rdate,'mm'),'03',nums,0)) 三月,sum(decode(to_char(rdate,'mm'),'04',nums,0)) 四月, 
+       sum(decode(to_char(rdate,'mm'),'05',nums,0)) 五月,sum(decode(to_char(rdate,'mm'),'06',nums,0)) 六月,
+       sum(decode(to_char(rdate,'mm'),'07',nums,0)) 七月,sum(decode(to_char(rdate,'mm'),'08',nums,0)) 八月,
+       sum(decode(to_char(rdate,'mm'),'09',nums,0)) 九月,sum(decode(to_char(rdate,'mm'),'10',nums,0)) 十月,
+       sum(decode(to_char(rdate,'mm'),'11',nums,0)) 十一月,sum(decode(to_char(rdate,'mm'),'12',nums,0)) 十二月
+           from personsituation 
+           where to_char(rdate,'yyyy')= '2015'
+  ) unpivot (sum1 for years in (一月,二月,三月,四月,五月,六月,七月,八月, 九月,十月,十一月,十二月) )) A
+left join
+  (select * from (
+    select sum(decode(to_char(rdate,'mm'),'01',nums,0)) 一月,sum(decode(to_char(rdate,'mm'),'02',nums,0)) 二月,
+       sum(decode(to_char(rdate,'mm'),'03',nums,0)) 三月,sum(decode(to_char(rdate,'mm'),'04',nums,0)) 四月, 
+       sum(decode(to_char(rdate,'mm'),'05',nums,0)) 五月,sum(decode(to_char(rdate,'mm'),'06',nums,0)) 六月,
+       sum(decode(to_char(rdate,'mm'),'07',nums,0)) 七月,sum(decode(to_char(rdate,'mm'),'08',nums,0)) 八月,
+       sum(decode(to_char(rdate,'mm'),'09',nums,0)) 九月,sum(decode(to_char(rdate,'mm'),'10',nums,0)) 十月,
+       sum(decode(to_char(rdate,'mm'),'11',nums,0)) 十一月,sum(decode(to_char(rdate,'mm'),'12',nums,0)) 十二月
+           from personsituation 
+           where to_char(rdate,'yyyy')= '2014'
+  ) unpivot (sum2 for years in (一月,二月,三月,四月,五月,六月,七月,八月, 九月,十月,十一月,十二月) )) B 
+on A.years = B.years
+
+
+//自定义函数
+create or replace function GETADDRESS(str in varchar2) return varchar2 is
+  Result varchar2(400);
+  typeStr varchar2(6);
+  nameStr1 varchar2(200);
+  nameStr2 varchar2(200);
+  nameStr3 varchar2(200);
+begin
+  
+  select type into typeStr from sys_area where code = str;
+  if typeStr = 4 then
+    select name into nameStr1 from sys_area where code = substr(str,0,2)||'0000';
+    select name into nameStr2 from sys_area where code = substr(str,0,4)||'00';
+    select name into nameStr3 from sys_area where code = str;
+    Result := nameStr1||nameStr2||nameStr3;
+  elsif typeStr = 3 then
+    select name into nameStr1 from sys_area where code = substr(str,0,2)||'0000';
+    select name into nameStr3 from sys_area where code = str;
+    Result := nameStr1||nameStr3;
+  elsif typeStr = 2 then
+    select name into nameStr3 from sys_area where code = str;
+    Result := nameStr3;
+  end if;
+  return(Result);
+end GETADDRESS;
+
+//选择5到10条的记录
+select *from (select rownum m,empno,ename from emp where rownum <=10) tmp where tmp.m>5;
+
+
+
+
+
+
+
+
+	<select id="findListByAreaID" resultType="TBzAreaDetail">
+		SELECT 
+			<include refid="tBzAreaDetailColumns"/>
+		FROM t_bz_area_detail a
+		<include refid="tBzAreaDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.area_id= #{tBzArea.id}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+WM_concat() 函数 连接字段

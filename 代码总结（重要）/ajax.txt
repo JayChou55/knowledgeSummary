@@ -1,0 +1,11 @@
+	$.ajax({
+  		type: "POST",
+  		url: "${ctx}/saveCom",
+  		data: $("#w55").serialize(),
+  		dataType: "json",
+  		async: false,//取消异步
+  		success:function(data){
+  			alert("提交成功");
+  			window.location.href="${ctx}/searchProduct?tsCatcode=3&code="+code+"&siteId="+'${site.id}';
+  		}
+  	});

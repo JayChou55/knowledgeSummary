@@ -1,0 +1,71 @@
+//js
+	
+		$(document).ready(function(){	
+			$("#btnApproval").click(function(){
+				$("#myModal").modal("show");
+				$("input[name='approval']").click(function(){
+					if($(this).val()=='01'){
+						$("#rejectReason").val("");
+						$("#rejectedReasonSpan").text("");
+						$("#turnDown").css("display","none");
+					}
+					if($(this).val()=='02'){
+						$("#turnDown").css("display","");
+					}
+				});
+				
+			});
+			$("#reasonSubmit").click(function(){
+				var rejectedReason = $("#rejectedReason").val();
+				var checkVal = $("input[name='approval']:checked").val();
+	
+				if(checkVal == '01'){
+				
+					
+					$.post("${ctx}/ts/product/approvalSave",{"id":$("#id").val()},function(data){
+						$("#myModal").hide();
+						location.href="${ctx}/ts/product/productCheckList";			
+					});
+				}else if(checkVal == '02'){
+					var rejectedReason = $("#rejectedReason").val();
+					if(rejectedReason != ""){
+						$.post("${ctx}/ts/product/rejectedSave",{"rejectedReason":rejectedReason,"id":$("#id").val()},function(data){
+							$("#myModal").hide();
+							location.href="${ctx}/ts/product/productCheckList";			
+					
+					});
+					
+					}else{
+						$("#rejectedReasonSpan").text("驳回原因不能为空！");
+					}
+				}
+			});
+		
+		
+		
+            	
+		});
+
+//html
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+			   <div class="modal-dialog">
+			      <div class="modal-content">
+			         <div class="modal-body">
+			        		审批决定：
+			        		<input type="radio" name="approval" value="01" checked="checked"/>批准&nbsp;&nbsp;&nbsp;&nbsp;
+			        		<input type="radio" name="approval" value="02"/>驳回<br><br><br>
+			        		<div id="turnDown" style="display: none;">
+				        		驳回原因：<span id="rejectedReasonSpan" style="color:red;text-align: center;"></span><br/>
+				        		<textarea id="rejectedReason" rows="5" maxlength="80" style="width: 520px;" class="required"></textarea>
+				        		
+			        		</div>
+			        		<div style="text-align: center;">
+							<input id="reasonSubmit" class="btn btn-primary" type="button" value="提交" />&nbsp;
+							<input class="btn " type="button" value="关闭" data-dismiss="modal"/>
+						</div>
+			         </div>
+	      		</div>
+			</div>
+	</div>
+	

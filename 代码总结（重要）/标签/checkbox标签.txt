@@ -1,0 +1,10 @@
+ //用未来元素做了全选和全不选
+ $(document).on("click","#checkAll",function(){
+
+	$('input[name="checkbox"]').attr("checked",this.checked);
+});
+var $subBox = $("input[name='checkbox']");
+$subBox.click(function(){
+
+	$("#checkAll").attr("checked",$subBox.length == $("input[name='subBox']:checked").length ? true : false);
+});

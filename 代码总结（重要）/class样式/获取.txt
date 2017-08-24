@@ -1,0 +1,2 @@
+$("select").eq(1).prop('selectedIndex', 0);
+$(".areaSelect:eq(0)")

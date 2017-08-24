@@ -1,0 +1,101 @@
+function setTime(data){
+				
+				setTimeout(deleteAjax(data), 1000);//过1s执行方法体。
+				};
+
+
+
+	<a href="#" onclick="syncData('${tBzCert.id }');">同步数据</a>  	
+
+
+var myDate = new Date();
+myDate.getYear();        //获取当前年份(2位)
+myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+myDate.getMonth();       //获取当前月份(0-11,0代表1月)
+myDate.getDate();        //获取当前日(1-31)
+myDate.getDay();         //获取当前星期X(0-6,0代表星期天)
+myDate.getTime();        //获取当前时间(从1970.1.1开始的毫秒数)
+myDate.getHours();       //获取当前小时数(0-23)
+myDate.getMinutes();     //获取当前分钟数(0-59)
+myDate.getSeconds();     //获取当前秒数(0-59)
+myDate.getMilliseconds();    //获取当前毫秒数(0-999)
+myDate.toLocaleDateString();     //获取当前日期
+var mytime=myDate.toLocaleTimeString();     //获取当前时间
+myDate.toLocaleString( );        //获取日期与时间
+
+
+function CurentTime()
+    { 
+        var now = new Date();
+        
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+        
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+        var ss = now.getSeconds();           //秒
+        
+        var clock = year + "-";
+        
+        if(month < 10)
+            clock += "0";
+        
+        clock += month + "-";
+        
+        if(day < 10)
+            clock += "0";
+            
+        clock += day + " ";
+        
+        if(hh < 10)
+            clock += "0";
+            
+        clock += hh + ":";
+        if (mm < 10) clock += '0'; 
+        clock += mm + ":"; 
+         
+        if (ss < 10) clock += '0'; 
+        clock += ss; 
+        return(clock); 
+}
+
+
+<c:foreach>
+变量状态参数，该属性有5个常用值
+count 表示当前遍历集合的元素个数
+index 表示当前遍历到集合的第几个元素
+current 表示当前的集合元素
+first 表示集合的第一个元素
+last 表示集合的最后一个元素
+我们最常用的就是count和index，用来搞斑马线表格
+常见的用法的是<c:forEach var="varity" items="${sessionScope.myList}" varStatus="status">
+<!--实现斑马线效果--> 
+<c:if test="${status.count%2==0}" >
+<tr bgcolor="lightyellow">
+</c:if>
+<c:if test="${status.count%2!=0}" >
+<tr>
+</c:if>
+<td>Elements</td>
+</tr> 
+</c:forEach>
+
+<c:forEach var="varity" items="${sessionScope.myList}" varStatus="status">
+${status.first}/${status.last}
+当前：${status.current}
+</c:forEach>
+
+
+
+
+js内获取model.addattrbuite 值方式
+$('officeEntList')//有问题
+
+var status ="${status}";
+//空格去除js
+<input type="text" onkeyup="this.value=this.value.replace(/\s+/g,'')">;
+
+
+
+JS里面0=false,""==false;

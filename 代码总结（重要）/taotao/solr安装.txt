@@ -1,0 +1,33 @@
+1.解压sorl-4.10.3.tgz.tgz
+	tar zxf solr-4.10.3.tgz.tgz(bin文件下有jetty)
+2.解压tomcat，并复制到solr（新建的）文件夹下tomcat（新建的）文件下中
+	tar zxf tomcat.8.0
+	cp -r tomcat8 /home/shop/solr/tomcat
+3.把solr的dist中war包放入tomcat的webapp中
+	cp -r solr-4.10.3/dist/solr-4.10.3.war /usr/local/solr/tomcat/webapp/solr.war
+4.进入tomcat启动（为了解压war包生成solr文件夹）
+	bin/start.up.sh
+5.日志同步查看
+	tail -f logs/catalina.out	
+6.关闭tomcat(关闭之后！可以考虑删掉solr.war包)
+	bin/shutdown.sh
+7.复制solr下example中jar包进入到tomcat生成的solr文件夹中（log4j相关的） 	
+	cp example/lib/ext/* /home/shop/solr/tomcat/webapp/solr/WEB-INF/lib
+	cp ./* /home/shop/solr/apache-tomcat-8.5.5/webapps/solr-4.10.3/WEB-INF/lib/
+8.配置solrhome(告诉tomcat地址)，复制solr-4.10.3下的example的solr文件到home/shop/solr文件中
+	cp -r solr /home/shop/solr/solrhome 
+9.进入tomcat/solr中配置web.xml,修改slor/home的位置(告诉tomcat其solr位置)
+
+总结：solr解压后 ，把solr.war放入tomcat的webapps里面运行后，生成solr文件。
+	  复制sf4j等jar包到solr的lib中。
+	  建立solrhome（可以拿解压后，solr里的example的solr文件夹当solrhome）
+	  修改tomcat里solr的web.xml更改其solrhome位置。 	
+	
+	
+===============分词器=================
+1.把分词器jar放入solr工程lib下
+	cp IKAnalyzer2012FF_u1.jar  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/lib/
+2.在solr的WEB-INF下创建classes复制分词器相关xml
+	cp ext_stopword.dic  IKAnalyzer.cfg.xml  mydict.dic  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/classes/
+3.solrconfig.xml schema.xml
+	
