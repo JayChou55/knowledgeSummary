@@ -1,7 +1,0 @@
-alter table t_bz_ent_cert_product rename column certified_production  to certified_production_tmp;
-
-alter table t_bz_ent_cert_product add certified_production number(10,3);
-
-update t_bz_ent_cert_product set certified_production=trim(certified_production_tmp);
-
-alter table t_bz_ent_cert_product drop column certified_production_tmp;
