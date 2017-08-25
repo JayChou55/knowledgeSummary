@@ -1,4 +1,5 @@
-1.解压后，创建data文件夹在zookper目录
+准备工作：要有jdk环境
+1.解压后，创建data文件夹在zookeeper目录
 	mkdir data
 2.进入conf，改名zoo_sample.cfg  zoo.cfg	
 	mv zoo_sample.cfg zoo.cfg
