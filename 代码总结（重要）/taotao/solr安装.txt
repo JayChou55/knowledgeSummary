@@ -1,4 +1,4 @@
-1.解压sorl-4.10.3.tgz.tgz
+﻿1.解压sorl-4.10.3.tgz.tgz
 	tar zxf solr-4.10.3.tgz.tgz(bin文件下有jetty)
 2.解压tomcat，并复制到solr（新建的）文件夹下tomcat（新建的）文件下中
 	tar zxf tomcat.8.0
@@ -30,4 +30,4 @@
 2.在solr的WEB-INF下创建classes复制分词器相关xml
 	cp ext_stopword.dic  IKAnalyzer.cfg.xml  mydict.dic  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/classes/
 3.solrconfig.xml schema.xml
-	
+	配置分词器内容，待续。。。
