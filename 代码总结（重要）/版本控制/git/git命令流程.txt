@@ -1,0 +1,57 @@
+//连接远程仓库（github）
+git remote add origin git@github.com:dengzhaotai/vlc_play.git 
+
+git init 初始化仓库
+
+创建分支 git branch 分支名
+
+
+提交跟新
+git add 分支名 或者 git add .
+
+$ git reflog vote
+查看最近操作记录
+
+git commit -m"备注"
+
+版本回退
+第一步： git reset --hard//强制回滚到上次提交
+ git reset --hard +版本号，回到该版本
+第二步：推上去
+git push -f -u origin +分支名
+
+
+git push origin 分支名
+//
+
+一般情况是先 git pull origin 分知名 再进行提交
+
+删除分支 git branch -D 分支名
+
+查看分支 本地 git branch
+查看分支  远程 git branch -a
+
+git status   查看代码的当前状态，看是否与服务器端一致。
+git diff     查看代码修改了哪些内容。
+git log --pretty=oneline 查看提交日志从近到远
+git reset --merge  解决合并不了的问题
+
+分支合并问题，今有dev1，dev2，每天提交到dev2，有一天dev1想到dev2的版本
+只需要三步
+
+git checkout dev1
+git merge dev2
+git push origin dev1
+
+
+多了一个缓存，避免了不必要的提交错误，更加方便commit反悔撤销（反悔可以不影响工作目录）。
+（通过命令 git reset HEAD^ 反悔，或者使用 git reset --soft HEAD^ 反悔）
+
+
+
+“你的本地仓库由 git 维护的三棵“树”组成。第一个是你的 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存你的改动；最后是 HEAD，指向你最近一次提交后的结果。”引用自参考资料（3）
+首先使用git add命令将计划的改动提交到缓冲区，
+然后使用git commit -m "代码提交信息"命令，将代码提交到HEAD，此时还没有提交到服务器
+执行如下命令以将这些改动提交到服务器：
+git push origin master
+可以把 master 换成你想要推送的任何分支。
