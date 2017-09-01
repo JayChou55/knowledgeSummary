@@ -1,0 +1,8 @@
+hanji@DESKTOP-L8U5UCS MINGW64 ~/Desktop
+$ git config --global gui.encoding utf-8
+
+hanji@DESKTOP-L8U5UCS MINGW64 ~/Desktop
+$ git config --global core.quotepath off
+
+hanji@DESKTOP-L8U5UCS MINGW64 ~/Desktop
+$ git config --global core.ignorecase false

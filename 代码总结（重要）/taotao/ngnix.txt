@@ -107,4 +107,34 @@
 			server 192.168.134.130:8080 weight:1;
 			server 192.168.134.130:8080 weight:2;
 	}	
-		
+
+六：新建conf文件夹用于配置
+	mkdir vhost
+	cd conf
+	mkdir vhost
+	配置到
+include vhost/*conf;
+
+ps -ef|grep nginx
+
+
+
+
+
+七、配置访问文件夹
+
+server {
+		listen       80;
+		autoindex off;#这是在创建索引
+		server_name  image.imooc.com;
+
+		#charset koi8-r;
+
+		#access_log  logs/host.access.log  main;
+
+		location / {
+		   root /ftpfile/
+		   add_header Acess-Control-Allow-Origin *;
+		}
+
+	}
