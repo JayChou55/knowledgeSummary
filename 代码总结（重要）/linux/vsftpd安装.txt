@@ -1,0 +1,63 @@
+1.删除
+	sudo yum remove vsftpd 
+2.安装
+	sudo yum -y install vsftpd
+3.根目录创建ftp的文件夹，用来存储文件
+	cd / ,  mkdir ftpfile
+4.创建用户，无法登陆权限，只能上传（useradd –g ftp –s /sbin/nologin ftpuser新建用户加入ftp组，/sbin/nologin意思是用户不允许登录（通过ftp可以连接）用户名为ftpuser）
+	sudo useradd ftp -d /ftpfile/ -s /sbin/nologin
+5.更改权限（查看：ll|grep ftp）
+	chown -R ftpuser.ftpuser /ftpfile/ 
+6.创建密码
+	passwd ftpuser
+7.创建文件
+	cd ftpfile	
+	vim index.html
+8.查看vsftpd位置	
+	whereis vsftpd(vsftpd: /usr/sbin/vsftpd /etc/vsftpd /usr/share/man/man8/vsftpd.8.gz)
+9.修改配置文件（/查询）
+	vim /etc/vsftpd/vsftpd.conf
+	
+	# You may fully customise the login banner string:
+	ftpd_banner=Welcome to blah FTP service.
+
+	增:local_root=/ftpfile  (本地目录指向这个路径)
+	增:use_localtime=yes
+
+	开：chroot_list_enable=Yes
+	
+	开：chroot_list_file=/etc/vsftpd/chroot_list （指定用户列表）
+	
+	修改：anonymous_enable=NO
+	
+10.加入用户列表
+	cd /etc/vsftpd/
+	vim chroot_list
+	添加：ftpuser 进文本。
+	
+11.端口设置
+	末尾加：
+	pasv_min_port=61001
+	pasv_max_port=62000
+	
+	
+	-A INPUT -p tcp -m multiport --dport 20,21  -m state --state NEW -j ACCEPT  
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 21 -j ACCEPT
+-A INPUT -p tcp --dport 61001:62000 -j ACCEPT            
+-A OUTPUT -p tcp --sprot 61001:62000 -j ACCEPT
+
+关闭SELINUX
+[html] view plain copy
+[root@localhost ~]# vim /etc/selinux/config  
+#SELINUX=enforcing           //注释掉  
+#SELINUXTYPE=targeted           //注释掉  
+SELINUX=disabled              //增加  
+
+生效：setenforce 0
+重启ftp;
+	
+12.启动
+	cd usr/sbin
+	service vsftpd status
+	service vsftpd start
+    service vsftpd restart

@@ -1,0 +1,3 @@
+rpm -qa | grep 是把搜索到的全部包的名字交给 grep 去过滤，只要包含那个字符串就会被显示出来
+
+mkdir /home/common/git -p     //递归创建目录
