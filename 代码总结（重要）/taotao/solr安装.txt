@@ -30,4 +30,17 @@
 2.在solr的WEB-INF下创建classes复制分词器相关xml
 	cp ext_stopword.dic  IKAnalyzer.cfg.xml  mydict.dic  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/classes/
 3.solrconfig.xml schema.xml
-	配置分词器内容，待续。。。
+	<fieldType name="text_ik" class="solr.TextField">
+		<analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
+	</fieldType>
+	<field name="item_title" type="text_ik" indexed="true" stored="true"/>
+	<field name="item_sell_point" type="text_ik" indexed="true" stored="true"/>
+	<field name="item_price"  type="long" indexed="true" stored="true"/>
+	<field name="item_image" type="string" indexed="false" stored="true" />
+	<field name="item_category_name" type="string" indexed="true" stored="true" />
+	<field name="item_desc" type="text_ik" indexed="true" stored="false" />
+	<field name="item_keywords" type="text_ik" indexed="true" stored="false" multiValued="true"/>
+	<copyField source="item_title" dest="item_keywords"/>
+	<copyField source="item_sell_point" dest="item_keywords"/>
+	<copyField source="item_category_name" dest="item_keywords"/>
+	<copyField source="item_desc" dest="item_keywords"/>
