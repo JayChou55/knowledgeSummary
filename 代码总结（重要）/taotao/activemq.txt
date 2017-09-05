@@ -1,0 +1,5 @@
+1.解压
+	tar -zxf activemq
+2.启动
+	cd bin
+	./activemq start

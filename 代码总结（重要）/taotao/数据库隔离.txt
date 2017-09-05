@@ -1,0 +1,8 @@
+脏读 dirty reads：当事务读取还未被提交的数据时，就会发生这种事件。
+					举例来说：Transaction1   修改了一行数据，然后   Transaction2   在   Transaction1   还未提交修改操作之前读取了被修改的行。如果   Transaction1   回滚了修改操作，那么   Transaction2   读取的数据就可以看作是从未存在过的。     
+
+不可重复的读 non-repeatable reads：当事务两次读取同一行数据，但每次得到的数据都不一样时，就会发生这种事件。
+					举例来说：Transaction1   读取一行数据，然后   Transaction2   修改或删除该行并提交修改操作。当   Transaction1   试图重新读取该行时，它就会得到不同的数据值（如果该行被更新）或发现该行不再存在（如果该行被删除）。     
+ 
+虚读 phantom read：如果符合搜索条件的一行数据在后面的读取操作中出现，但该行数据却不属于最初的数据，就会发生这种事件。
+					举例来说：Transaction1   读取满足某种搜索条件的一些行，然后   Transaction2   插入了符合   Transaction1   的搜索条件的一个新行。如果   Transaction1   重新执行产生原来那些行的查询，就会得到不同的行。
