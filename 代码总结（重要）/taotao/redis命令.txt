@@ -1,0 +1,15 @@
+查询key
+	keys *, keys xxx,keys xx*...
+返回随机key
+	randomkey
+返回类型 
+	type xxx
+判断有没有 
+	exists key
+删除 
+	del key
+
+查询key的生命周期，返回秒数
+	ttl key，不存在返回-1,2.8版本后返回-2
+设置生命周期	
+	expire key	10（设置key 为10秒生命周期）
