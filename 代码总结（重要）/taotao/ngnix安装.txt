@@ -49,6 +49,9 @@
 7.关闭
 	./ngins -s stop    或者kill 10910
 	暴力关闭kill 9
+	
+	kill -HUB 26733（或者查看 logs/nginx.pid,命令：kill -HUP 'cat logs/nginx.pid'）
+	优雅关闭26733端口的nginx
 8.重新刷新配置文件	
 	./nginx -s reload	
 	
