@@ -1,0 +1,2 @@
+把war包放入webapp中 启动后 ，进入WEB-INF查看 对应用户名密码。
+修改dubbo.properties的zookeeper地址可以查看对应服务。
