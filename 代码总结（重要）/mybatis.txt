@@ -99,4 +99,16 @@ and b.facname like '%'||#{certList.facname}||'%'
 			</if>
 		</where>
 			order by a.create_date desc)where  ROWNUM <![CDATA[<= 10]]>
-	</select>
+</select>
+
+//数组删除
+public void deletes(Long[] ids){}
+<delete id='delete' parameterType='Long'>
+	delete from bbs_brand
+		<where>
+			id in
+				<foreach collection="array" item="id" separator="," open="(" close=")">
+					#{id}
+				</foreach>
+		</where>
+</delete>			

@@ -29,7 +29,8 @@
 	cp IKAnalyzer2012FF_u1.jar  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/lib/
 2.在solr的WEB-INF下创建classes复制分词器相关xml
 	cp ext_stopword.dic  IKAnalyzer.cfg.xml  mydict.dic  /home/shop/solr/apache-tomcat-8.5.5/webapps/solr/WEB-INF/classes/
-3.solrconfig.xml schema.xml
+3.solrconfig.xml schema.xml，设置自定义数据类型，支持IKAnalyzer
+
 	<fieldType name="text_ik" class="solr.TextField">
 		<analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>
 	</fieldType>
@@ -44,3 +45,14 @@
 	<copyField source="item_sell_point" dest="item_keywords"/>
 	<copyField source="item_category_name" dest="item_keywords"/>
 	<copyField source="item_desc" dest="item_keywords"/>
+
+4.配置自定义分词
+	cd tomcat/webapp/solr/WEB-INF/classes/
+	打开IKAnalyzer.cfg 去掉屏蔽的ext_dict注释
+	touch ext.dic
+	vim ext.dic
+	如:传智播客
+	   瑜伽服	
+	vim stopword.dic 
+	服(则不会把服字设为分词)
+	

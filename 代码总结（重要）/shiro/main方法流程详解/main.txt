@@ -1,0 +1,44 @@
+public static void main(String[] args) {
+
+    log.info("My First Apache Shiro Application");
+
+    //1.从 Ini 配置文件中获取 SecurityManager 工厂
+    Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
+
+    //2.获取 SecurityManager 实例
+    SecurityManager securityManager = factory.getInstance();
+
+    //3.将 SecurityManager 实例绑定给 SecurityUtils，验证realm配置文件用
+	/**<!-- 定义Shiro安全管理配置 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="systemAuthorizingRealm" />
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>*/
+    SecurityUtils.setSecurityManager(securityManager);
+
+    //4.获取当前登录用户
+    Subject currentUser = SecurityUtils.getSubject();
+
+    //5.判断是否登录，如果未登录，则登录
+    if (!currentUser.isAuthenticated()) {
+        //6.创建用户名/密码验证Token（Web 应用中即为前台获取的用户名/密码）
+        UsernamePasswordToken token = new UsernamePasswordToken("wang", "123");
+        try {
+            //7.执行登录，如果登录未成功，则捕获相应的异常
+            currentUser.login(token);
+        } catch (UnknownAccountException uae) {
+            log.info("There is no user with username of " + token.getPrincipal());
+        } catch (IncorrectCredentialsException ice) {
+            log.info("Password for account " + token.getPrincipal() + " was incorrect!");
+        } catch (LockedAccountException lae) {
+            log.info("The account for username " + token.getPrincipal() + " is locked.  " +
+                    "Please contact your administrator to unlock it.");
+        }
+        // ... catch more exceptions here (maybe custom ones specific to your application?
+        catch (AuthenticationException ae) {
+            //unexpected condition?  error?
+        }
+    }
+
+}
