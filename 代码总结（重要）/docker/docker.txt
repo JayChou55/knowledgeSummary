@@ -1,0 +1,83 @@
+pid:容器有自己独立的进程表和1号进程
+net:容器有自己独立的network info
+ipc：在ipc通信的时候，需要加入额外信息来标示进程
+mnt:每个容器有自己唯一的目录挂在
+utc:每个容器有独立的hostname和domain
+
+
+sed -i '/^SELINUX=/c\SELINUX=disabled' /etc/selinux/config
+setenforce 0
+
+搜索
+docker search centos
+获取镜像
+docker pull
+查看镜像 
+dokcer images
+删除镜像
+docker rmi
+
+查看运行的docker
+docker ps -a 
+
+启动容器
+docker run --name -h hostname
+停止容器 
+docker stop CONTAINER ID
+查看容器 
+docker ps
+进入容器
+docker exec | docker attach
+删除容器
+docker rm CONTATINER ID
+
+随机映射
+docker run -d -P --name mynginx1 nginx
+docker ps -l
+指定映射
+docker run -d -p 91:80 mynginx2 nginx 
+-p hostPort:containerPort 
+-p ip:hostPort:contatinerPort
+-p ip::containerPort
+-p hostPort:containerPort
+-p hostPort:containerPort
+
+
+安装
+yum install docker or yum install -y docker-io
+
+
+启动 Docker 服务
+
+安装完成后，使用下面的命令来启动 docker 服务，并将其设置为开机启动：
+
+service docker start
+chkconfig docker on
+ 
+docker search centos
+docker pull centos 
+docker run centos /bin/echo 'Hello world'
+
+docker ps -a
+docker run --name mydocker -it centos /bin/bash
+docker run -d --name mynginx nginx  
+	会返回容器id，如果没有nginx，会自动下载
+	-d：后台运行
+
+docker ps -l
+docker statrt CONTAINER ID
+
+=================推荐的进入容器的方法：=====================
+docker inspect --format "{{.State.Pid}" mynginx 
+获取这个容器的ID 如：32439
+
+nsenter 进入容器 如果进入不了 yum install -y util-linux
+nsenter --target 32439 --mount  --uts --ipc --net --pid 进入nginx容器 32439
+
+./in.sh mynginx
+==================网络==========================
+iptables -t nat -L -n
+./in.sh mynginx
+ping www.baidu.com
+
+ip ro li

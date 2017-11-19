@@ -1,0 +1,66 @@
+微服务设计原则
+	单一职责原则
+	服务自治原则
+	轻量级通信原则
+	接口明确原则
+	
+yml风格
+	竖向，严格的缩进	
+	
+RestTemplate  
+	以调用http请求的WebService，并将结果转换成相应的对象类型
+	  @Bean
+ 	 public RestTemplate restTemplate() {
+   		 return new RestTemplate();
+  	}
+服务提供者与服务消费者
+user: 
+ 	userServicePath: http://localhost:7900/simple/
+
+@GetMapping("/movie/{id}")
+ 	public User findById(@PathVariable Long id) {
+    		return this.restTemplate.getForObject(this.userServicePath + id, User.class);
+	}
+	
+	
+	
+服务发现 
+	心跳机制
+	客户端发现：Eureka	Zk
+
+	
+为什么 Eureka
+	springcloud支持性好
+
+Eureka心跳机制
+	30秒	3次======90秒
+	Eureka Service	提供注册服务，各个节点会在此中心注册
+	Eureka Client	java客户端	有个内置的使用轮询的负载均衡器
+	缓存机制，即使所有的Eureka Service都挂了，利用缓存中的信息消费其他服务的api
+
+	启动类加:
+	@SpringBootApplication
+	@EnableEurekaServer
+		yml：
+		eureka:
+		  client:
+			register-with-eureka: false
+			fetch-registry: false
+			service-url:
+			  defaultZone: http://user:password123@localhost:8761/eureka
+
+instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}} 注册中心的id名字
+    metadata-map:
+      zone: ABC      # eureka可以理解的元数据
+      lilizhou: BBC  # 不会影响客户端行为
+    lease-renewal-interval-in-seconds: 5
+
+spring-bott-starter-actuator	健康检查的依赖
+	
+	
+Application Service
+
+Ribbon
+	客户端负载均衡，区别于nginx
