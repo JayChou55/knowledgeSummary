@@ -1,0 +1,28 @@
+
+microservice-provider-user:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+	
+
+
+@SpringBootApplication
+@EnableEurekaClient
+public class ConsumerMovieRibbonApplication {
+
+  @Bean
+  @LoadBalanced
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(ConsumerMovieRibbonApplication.class, args);
+  }
+}	
+	
+	============================================
+	
+	ribbon使用不用eureka
+	microservice-provider-user:
+  ribbon:
+    listOfServers: localhost:7900

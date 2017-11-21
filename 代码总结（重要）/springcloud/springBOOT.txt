@@ -1,0 +1,114 @@
+spring-boot-starter-wb:MVC,AOP的依赖包
+
+@restController
+	@ReponseBody @Controller
+	
+@SpringBootApplication
+	指定springboot这是main方法中的运行方法
+	@SpringBootApplication
+	public class App{
+		public static void main(String[] args){
+			SpringApplication.run(App.class,args);
+		}
+	}
+	
+返回对象的===》直接返回json类型数据	
+	@RequestMapping("/getDemo")
+	public Demo getDemo(){
+		Demo demo = new Demo();
+		demo.setId(1);
+		demo.setName("张三");
+		demo.setCreateTime(new Date());
+		demo.setRemarks("这是备注信息");
+		return demo;
+	}
+	
+	
+	<!-- 构建节点. -->
+	<build>
+		<plugins>
+		
+		
+			<!-- 在这里添加springloader plugin
+			<plugin>
+          		<groupId>org.springframework.boot</groupId>
+          		<artifactId>spring-boot-maven-plugin </artifactId>
+          		<dependencies>  
+		           <dependency>  
+		               <groupId>org.springframework</groupId>  
+		               <artifactId>springloaded</artifactId>  
+		               <version>1.2.4.RELEASE</version>
+		           </dependency>  
+		        </dependencies>  
+		        <executions>  
+		           <execution>  
+		               <goals>  
+		                   <goal>repackage</goal>  
+		               </goals>  
+		               <configuration>  
+		                   <classifier>exec</classifier>  
+		               </configuration>  
+		           </execution>  
+	       		</executions>
+			</plugin>
+			 -->
+			
+			<!-- 这是spring boot devtool plugin -->
+			<plugin>
+	            <groupId>org.springframework.boot</groupId>
+	            <artifactId>spring-boot-maven-plugin</artifactId>
+	            <configuration>
+	          		<!--fork :  如果没有该项配置，肯呢个devtools不会起作用，即应用不会restart -->
+	                <fork>true</fork>
+	            </configuration>
+	        </plugin>
+			
+			
+		</plugins>
+		
+		spring boot dev启动
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!--fork :  如果没有该项配置，肯呢个devtools不会起作用，即应用不会restart -->
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+			ctrl+shift+alt+/
+			automakeallow...
+	</build>	
+	
+	Repository接口
+	1. Repository是一个空接口，即是一个标记接口；
+2. 若我们定义的接口继承了Repository，则该接口会被IOC容器识别为一个Repository Bean纳入到IOC容器中，进而可以在该接口中定义满足一定规范的方法。
+3. 实际上也可以通过@RepositoryDefinition,注解来替代继承Repository接口。
+4. 查询方法以find | read | get开头；
+5. 涉及查询条件时，条件的属性用条件关键字连接，要注意的是条件属性以首字母大写。
+6.使用@Query注解可以自定义JPQL语句实现更灵活的查询
+
+CrudRepository接口
+CrudRepository 接口提供了最基本的对实体类的添删改查操作
+ --T save(T entity);//保存单个实体? ?
+  --Iterable<T> save(Iterable<? extends T> entities);//保存集合??????? ?
+  --T findOne(ID id);//根据id查找实体???????? ?
+  --boolean exists(ID id);//根据id判断实体是否存在???????? ?
+  --Iterable<T> findAll();//查询所有实体,不用或慎用!???????? ?
+  --long count();//查询实体数量???????? ?
+  --void delete(ID id);//根据Id删除实体???????? ?
+  --void delete(T entity);//删除一个实体? ?
+  --void delete(Iterable<? extends T> entities);//删除一个实体的集合???????? ?
+  --void deleteAll();//删除所有实体,不用或慎用!? ?
+
+  PagingAndSortingRepository
+  
+  该接口提供了分页与排序功能   
+ --Iterable<T> findAll(Sort sort); //排序    
+--Page<T> findAll(Pageable pageable); //分页查询（含排序功能） 
+
+其它接口
+JpaRepository：查找所有实体，排序、查找所有实体，执行缓存与数据库同步
+
+JpaSpecificationExecutor：不属于Repository体系，实现一组 JPA Criteria 查询相关的方法，封装  JPA Criteria 查询条件。通常使用匿名内部类的方式来创建该接口的对象。
+
+自定义 Repository：可以自己定义一个MyRepository接口。

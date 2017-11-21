@@ -1,0 +1,13 @@
+rpm常用命令
+	i:安装应用程序
+	e:卸载应用程序
+	vh：显示安装进度
+	U：升级软件包
+	qa：显示所有已安装的软件包
+	
+	rpm -ql
+	 keepalived
+	 结合grep使用
+	 例子：rpm -ivh gcc-c++-4.4.7-4 el6.x86_64.rpm
+	 查看安装rpm文件位置 rpm -ql mysql
+	 查看rpm 已经安装过的文件 rpm -qa|grep mysql

@@ -1,0 +1,48 @@
+解压后
+cd mycat 
+	bin
+	catlet
+	lib
+	logs
+	version.txt
+查看当前日志信息
+	cd logs
+	tail -f wrapper.log
+打开
+	cd bin
+	./mycat start
+进入mysql
+	mysql -uroot -p -h127.0.0.1 -P8066
+	
+配置
+	cd conf/
+	server.xml 用户名密码
+	schema.xml 配置表
+	rule.xml 规则或者算法
+	
+vim server.xml
+增加一个
+<user name="root">
+	<property name="password">root</property>
+	<property name="schemas">babasport></property>
+</user>
+	
+vim schema.xml
+	全局表  
+	<schema name ="babasport".........>
+		<table name ="bbs_color" ....type="global" dataNode ="dn1,dn2,dn3"/>
+	关联表
+	<table name="bbs_buyer"......dataNode="dn1,dn2,dn3" rule ="sharding-by-pattern">
+		<childTable name ="bbs_order" ...primK... joinKey ="buyer_id" parentKey="id"
+			<childTable name="bbs_detail" joinKey="order_id" parentKey="id" />
+		</childTable>
+	</table>
+	<table name="bbs_product"......dataNode="dn1,dn2,dn3" rule ="sharding-by-pattern">
+		<childTable name ="bbs_sku" ...primK... joinKey ="product_id" parentKey="id">
+			
+		</childTable>
+	</table>
+	
+vim rule.xml
+	sharding-by-pattern	
+	
