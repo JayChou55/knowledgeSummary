@@ -1,0 +1,65 @@
+@Component 
+@ConfigurationProperties(prefix = "sms")
+	@ConfigurationProperties的大致作用就是通过它可以把properties或者yml配置直接转成对象
+	
+	配置文件:
+	sms.url=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	sms.appkey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	
+	@Component
+	@ConfigurationProperties(prefix = "sms") ============默认去找application.yml
+	public class SmsSettings {
+		
+		private  String url ="";
+		private  String appkey ="";
+	
+	sms:
+	 name: forezp
+	 age: 12
+	 number:  ${random.int}
+	 uuid : ${random.uuid}
+	 max: ${random.int(10)}
+	 value: ${random.value}
+	 greeting: hi,i'm  ${sms.name}	
+	 
+	@Configuration
+	@PropertySource(value = "classpath:test.properties")   ============去找test.properties
+	@ConfigurationProperties(prefix = "com.forezp")
+	public class User {
+		private String name;
+		private int age;
+=============================================================================================
+把对象的属性 注入到实体类当中
+@RestController
+@EnableConfigurationProperties({ConfigBean.class,User.class})
+public class LucyController {
+    @Autowired
+    ConfigBean configBean;
+
+    @RequestMapping(value = "/lucy")
+    public String miya(){
+        return configBean.getGreeting()+" >>>>"+configBean.getName()+" >>>>"+ configBean.getUuid()+" >>>>"+configBean.getMax();
+    }
+
+
+
+=============================================================================================
+
+
+
+
+@GeneratedValue： 
+@GeneratedValue 
+	用于标注主键的生成策略，通过strategy 属性指定。默认情况下，JPA 自动选择一个最适合底层数据库的主键生成策略：SqlServer对应identity，MySQL 对应 auto increment。 
+	在javax.persistence.GenerationType中定义了以下几种可供选择的策略： 
+	–IDENTITY：采用数据库ID自增长的方式来自增主键字段，Oracle 不支持这种方式； 
+	–AUTO： JPA自动选择合适的策略，是默认选项； 
+	–SEQUENCE：通过序列产生主键，通过@SequenceGenerator 注解指定序列名，MySql不支持这种方式 
+	–TABLE：通过表产生主键，框架借由表模拟序列产生主键，使用该策略可以使应用更易于数据库移植。
+	@Table(name="CUSTOMERS")
+	@Entity
+	public class Customer {
+		@GeneratedValue(strategy=GenerationType.AUTO)
+		@Id
+		private Integer id;
+		private String name;

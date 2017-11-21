@@ -1,5 +1,5 @@
 Feign
-
+远程调用和本地调用给你的感觉一样
 
 @SpringBootApplication
 @EnableEurekaClient
