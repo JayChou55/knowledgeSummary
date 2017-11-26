@@ -1,3 +1,13 @@
+yum install docker
+
+docker registry
+	registry 是docker镜像中央存储仓库
+docker info 查看信息
+docker version
+
+docker run 后面追加-d=true 或者-d 那么容器将会在后台模式运行
+docker run没有指定--name 那么deamon会自动生成一个随机UUID
+
 pid:容器有自己独立的进程表和1号进程
 net:容器有自己独立的network info
 ipc：在ipc通信的时候，需要加入额外信息来标示进程
@@ -81,3 +91,46 @@ iptables -t nat -L -n
 ping www.baidu.com
 
 ip ro li
+
+
+============数据管理===========================
+数据卷
+	-v/data
+	-v src:dst
+数据卷容器
+	--volumes-
+	from
+
+docker run -it --name volume-test1	-h nginx -v /data nginx
+-i:终端保持打开状态
+t:启动一个tty
+-h：启动主机名
+-v:数据卷
+
+docker inspect -f {{.Volumes}} volume-test1
+	
+docker run -d -p 5000:5000 --name registry
+
+生成docker镜像
+docker build -t registry_url/namespace/csphere/centos:lastest
+docker build -t csphere/centos:7.1 . 或者./path（path地址）
+
+启动
+	docker run -d 
+	docker run -it
+	docker run -d -P 2222:22 大P把2222端口映射给22，可能会变
+	docker run -d -p 2222:22 小p把2222固定端口映射给22 
+ docker build -t csphere/mysql:5.5 .
+ 
+docker run -d -p 8080:80 --name website csphere/php-fpm:5.4	
+docker run -d -p 3306:3306 --name dbserver csphere/mysql:5.5
+
+docker exec -it dbserver /bin/bsah 进入交互模式 进入了dbserver 输入mysql 可以 运行mysql命令了 退出 exit
+
+删除 docker rm -f dbserver 强制删除 这个容器
+
+docker run -d -p 3306:3306 -v host_dir:container_dir
+docker run -d -p 3306:3306 -v /var/lib/docker/vfs/dir/mydata:/var/lib/mysql csphere/mysql:5.5
+
+docker exec -it d03 /bin/bash  
+	-it后是 container id  通过这种方式进入容器

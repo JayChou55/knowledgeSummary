@@ -1,0 +1,316 @@
+
+==========================PRO_INSERT_CODE============================================
+create or replace procedure "PRO_INSERT_CODE"
+			(yearCode in VARCHAR2, 
+			officeCode in VARCHAR2, authType in VARCHAR2, 
+			tagId in VARCHAR2, printOrderId in VARCHAR2,
+			printCount in VARCHAR2,createBy in VARCHAR2, 
+			result out VARCHAR2, result2 out VARCHAR2) is	
+  maxNo varchar2(20);       --最大数
+  sNum number;              --开始序列号
+  eNum number;              --结束序列号
+  sql_txt1 varchar2(500);   --sql语句
+  sql_txt2 varchar2(500);   --sql语句2
+  existNo number(2);        --判断是否在其他平台备案过
+  tableName varchar2(20);   --表名
+  yearNow varchar2(2);      --计算后的两位年份
+  sNo varchar2(5);          --最大顺序号的9-11位
+  eNo varchar2(5);          --最大顺序号+印刷数量的9-11位
+  existTab number(2);       --检查表是否存在
+  yearCodeLast varchar2(2); --传入后截取的两位年份（方便不多次使用函数）
+  isCarry boolean;          --是否进位
+begin
+  ---------------------------------
+  ----yearCode    年份
+  ----officeCode  机构编码
+  ----authType    认证类型
+  ----tagId       标签id
+  ----printOrderId  订单号id
+  ----printCount    印刷标签数量
+  ----createBy      创建者
+  ---------------------------------
+  yearCodeLast := substr(yearCode,-2);--截取年份后两位
+  --1、查询插入数据的表名称
+  tableName := 'T_BZ_CODE_'||yearCode||'_'||authType;
+  --2、查询机构是否今年在其他平台备案过
+  sql_txt1 := 'select count(1) from SYS_OFFICE t where code = '''||officeCode||''' and other_platform=''1'' and (to_char(t.create_date, ''yyyy'') = to_char(sysdate, ''yyyy''))';
+  execute immediate sql_txt1 into existNo;
+  -- existNo >0 在其他平台备案过，否则没有
+  if(existNo>0) then
+   --如果备案过，赋值00
+     yearNow := '00';
+  else
+    --否则截取后2位
+     yearNow := substr(yearCode,-2);
+  end if;  
+  --3、判断表存不存在，如果不存在则创建
+  SELECT COUNT(1) into existTab FROM user_tables WHERE upper(table_name) = upper(tableName);
+  --dbms_output.put_line('existNo::'|| existNo );
+  if (existTab < 1) then
+    execute immediate  'CREATE TABLE '||tableName||'
+        (
+            SERIAL_NO       VARCHAR2(20) NOT NULL,
+            CODE            VARCHAR2(20) NOT NULL,
+            AUTH_TYPE       VARCHAR2(2) NOT NULL,
+            TAG_ID          VARCHAR2(40),
+            PRINT_ORDER_ID  VARCHAR2(40),
+            APPLY_ID        VARCHAR2(40),
+            ENT_ID          VARCHAR2(40),
+            PRODUCT_ID      VARCHAR2(40),
+            BATCH_RECORD_ID VARCHAR2(40),
+            VCODE           VARCHAR2(5) NOT NULL,
+            OFFICE_CODE     VARCHAR2(5),
+            CREATE_BY       VARCHAR2(40),
+            CREATE_DATE     DATE,
+            UPDATE_BY       VARCHAR2(40),
+            UPDATE_DATE     DATE,
+            REMARKS         VARCHAR2(255)
+        ) tablespace TS
+          PARTITION BY RANGE (CREATE_DATE)
+          interval (numtoyminterval(1,''month''))  
+        (  
+          PARTITION t_test_'||yearcode||'_'||authType||'_1 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-02-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,  
+          PARTITION t_test_'||yearcode||'_'||authType||'_2 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-03-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_3 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-04-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_4 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-05-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_5 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-06-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_6 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-07-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_7 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-08-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_8 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-09-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_9 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-10-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_10 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-11-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_11 VALUES LESS THAN (TO_DATE('||''''||yearcode||'-12-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS,
+          PARTITION t_test_'||yearcode||'_'||authType||'_12 VALUES LESS THAN (TO_DATE('||''''||(yearcode+1)||'-01-01 00:00:00'||''''||','||'''yyyy-mm-ddhh24:mi:ss'''||')) TABLESPACE TS
+        )';
+      -- 添加约束
+      execute immediate  'alter table '||tableName||' add constraint PK_'||tableName||' Primary key(SERIAL_NO)';
+      execute immediate 'create index INDEX_'||yearCode||'_'||authType||'_CODE on '||tableName||' (CODE) LOCAL';
+      commit;
+  end if;
+  --4、找当前机构最大流水号
+  if (length(officeCode)>3) then
+    sql_txt1 := 'select max(substr(SERIAL_NO,instr(SERIAL_NO,''-'',-1)+1)) from '||tableName||' where subStr(SERIAL_NO,0,7)  = '''||yearCodeLast||officeCode||authType||'''';
+  else
+    sql_txt1 := 'select max(substr(SERIAL_NO,instr(SERIAL_NO,''-'',-1)+1)) from '||tableName||' where subStr(SERIAL_NO,0,6)  = '''||yearCodeLast||officeCode||authType||'''';
+  end if;
+   execute immediate sql_txt1 into maxNo;
+  --dbms_output.put_line('sql_txt1::'|| sql_txt1 );
+  --认证类型：0-9，机构编码：认证机构3位，监管机构4位
+  --认证机构流水号=年份（2）+机构编码（3）+认证类型（1）+"-"+顺序号（11）
+  --监管机构流水码=年份（2）+机构编码（4）+认证类型（1）+"-"+顺序号（9）
+  --认证机构追溯码（暗码）= 机构码（3）+年份（2）+随机码(11)+认证类型（1）
+  --监管机构追溯码（暗码）=机构码（4）+年份（2）+随机码(9)+认证类型(1)
+  --maxNo:当前机构的最大顺序号
+  begin      
+    --1、判断第八位是否进位 （maxNo:流水号的后9位）
+    if maxNo is null then--如果是空值，肯定不进位
+      isCarry := false;
+      if (length(officeCode)>3) then
+         sNo := '0';--第9位
+      else
+         sNo := '000';--第9-11位
+      end if;
+      sNum := 0;--起始序列号
+      eNum :=to_number(printCount)-1; --结束序列号
+    else
+      maxNo := lpad((to_number(maxNo)+1),11,0);--11位起始序列号
+      if (length(officeCode)>3) then
+         sNo := substr(maxNo,2,1); --第9位
+         eNo := substr(lpad((to_number(maxNo)+to_number(printCount)),9,0),0,1);--结束流水号的第9位
+      else
+         sNo := substr(maxNo,0,3); --第9-11位
+         eNo := substr(lpad((to_number(maxNo)+to_number(printCount)),11,0),0,3);--结束流水号的第9-11位
+      end if;
+      sNum := substr(maxNo,4,8);--起始序列号
+      --开始流水号的高位=结束流水号的高位，则不进位      
+      if sNo = eNo then
+        isCarry := false; 
+        --结束序列号    
+        eNum :=(to_number(substr(maxNo,4,8))+to_number(printCount))-1;   
+      else
+        isCarry := true;  
+        --结束序列号
+        eNum := to_number(printCount)-(99999999-to_number(substr(maxNo,4,8)))-1-1;
+      end if;
+    end if;
+    --2、插入数据
+    --execute immediate 'alter  session enable parallel dml';
+    if isCarry then--进位
+      sql_txt1 := 'insert /*+append*/ into  '||tableName||' (SERIAL_NO, CODE,AUTH_TYPE,TAG_ID,PRINT_ORDER_ID,OFFICE_CODE,CREATE_BY,CREATE_DATE,VCODE)
+        SELECT  /*+PARALLEL(8)*/ '''||yearCodeLast||officeCode||authType||'-'||sNo||'''||lpad(ID,8,0),'''||officeCode||yearNow||sNo||'''||code||'''||authType||''','''||authType||''','''||tagId||''' ,'''||printOrderId||''','''||officeCode||''','''||createBy||''',TO_DATE(''2017-12-20'',''yyyy-mm-dd''),TRUNC(DBMS_RANDOM.VALUE(1000,9999))
+        from T_BA_CODE WHERE (ID >= '||sNum||' AND ID <=99999999)' ;
+      sql_txt2 := 'insert /*+append*/ into  '||tableName||' (SERIAL_NO, CODE,AUTH_TYPE,TAG_ID,PRINT_ORDER_ID,OFFICE_CODE,CREATE_BY,CREATE_DATE,VCODE)
+        SELECT  /*+PARALLEL(8)*/ '''||yearCodeLast||officeCode||authType||'-'||eNo||'''||lpad(ID,8,0),'''||officeCode||yearNow||eNo||'''||code||'''||authType||''','''||authType||''','''||tagId||''' ,'''||printOrderId||''','''||officeCode||''','''||createBy||''',TO_DATE(''2017-12-20'',''yyyy-mm-dd''),TRUNC(DBMS_RANDOM.VALUE(1000,9999))
+        from T_BA_CODE WHERE ID >='|| 0 ||' AND ID <='||eNum;
+      execute immediate  sql_txt1;
+      commit;
+      execute immediate  sql_txt2;
+      result := yearCodeLast||officeCode||authType||'-'||sNo||lpad(to_char(sNum),8,0);
+      result2 := yearCodeLast||officeCode||authType||'-'||eNo||lpad(to_char(eNum),8,0);
+    else
+      sql_txt1 := 'insert /*+append*/ into  '||tableName||' (SERIAL_NO, CODE,AUTH_TYPE,TAG_ID,PRINT_ORDER_ID,OFFICE_CODE,CREATE_BY,CREATE_DATE,VCODE)
+      SELECT  /*+PARALLEL(8)*/ '''||yearCodeLast||officeCode||authType||'-'||sNo||'''||lpad(ID,8,0),'''||officeCode||yearNow||sNo||'''||code||'''||authType||''','''||authType||''','''||tagId||''' ,'''||printOrderId||''','''||officeCode||''','''||createBy||''',TO_DATE(''2017-12-20'',''yyyy-mm-dd''),TRUNC(DBMS_RANDOM.VALUE(1000,9999))
+      from T_BA_CODE WHERE ID >= '||sNum||' AND ID <='||eNum; 
+      execute immediate  sql_txt1;
+      result := yearCodeLast||officeCode||authType||'-'||sNo||lpad(to_char(sNum),8,0);
+      result2 := yearCodeLast||officeCode||authType||'-'||sNo||lpad(to_char(eNum),8,0);
+    end if;  
+    --execute immediate 'alter  session disable parallel dml';  
+  end;
+  commit;
+  exception
+    when others then
+      dbms_output.put_line(SQLERRM);
+    rollback;
+end PRO_INSERT_CODE;
+
+
+
+
+===========================PRO_INSERT_PIECE_NUM============================================
+
+
+create or replace procedure PRO_INSERT_PIECE_NUM(
+	yearCode in VARCHAR2,tagId in VARCHAR2,officeCode in VARCHAR2,
+	printCount in VARCHAR2,pieceTagNum in VARCHAR2,
+	beginNum in VARCHAR2,authType in VARCHAR2,
+	officeId in VARCHAR2,printOrderId in VARCHAR2,
+	result out VARCHAR2, result2 out VARCHAR2) is
+--yearCode（四位年份）
+--officeCode（机构3位代码）
+--tagId（标签id）
+--printCount（印刷数量）
+--pieceTagNum（每版的标签数）
+--beginNum（起始流水号）
+--result（起始版数）
+--result2（终止版数）
+--authType （追溯码类型）
+--officeId(机构ID)
+--printOrderId（订单Id）
+  maxNo varchar2(20);       --当前最大版号
+  sNum number;              --开始版号
+  eNum number;              --结束版号
+  countPieceNum number;     --本次生成总版号数量
+  sql_txt1 varchar2(2000);   --sql语句
+  tableName varchar2(20);   --表名
+  mathLength number;        --流水号后端的数字长度
+  existTab number(2);       --检查表是否存在
+  yearCodeLast varchar2(2); --传入后截取的两位年份（方便不多次使用函数）
+begin
+  yearCodeLast := substr(yearCode,-2);--截取年份后两位
+  --1、查询插入数据的表名称
+  tableName := 'T_BZ_PIECE_NUM_'||yearCodeLast;
+  --2、判断表存不存在
+  SELECT COUNT(1) into existTab FROM user_tables WHERE upper(table_name) = upper(tableName);
+  if (existTab < 1) then
+    execute immediate  'CREATE TABLE '||tableName||'
+        (
+            PIECE_NUM       VARCHAR2(15) NOT NULL,
+            BEGIN_NUM       VARCHAR2(20) NOT NULL,
+            END_NUM         VARCHAR2(20) NOT NULL,
+            TAG_ID          VARCHAR2(40) NOT NULL,
+            office_Id       VARCHAR2(40) NOT NULL,
+            print_order_Id  VARCHAR2(40) NOT NULL,
+            status          VARCHAR2(10) NOT NULL,
+            PACKAGE_NUM     VARCHAR2(20)
+        ) tablespace TS';
+      -- 添加约束
+    execute immediate  'alter table '||tableName||' add constraint PK_'||tableName||' Primary key(PIECE_NUM)';
+    commit;
+  end if;
+  --3、找当前表的最大版号
+  sql_txt1 := 'select max(PIECE_NUM) from '||tableName||' where PIECE_NUM like '''||yearCodeLast||officeCode||'%''';
+  execute immediate sql_txt1 into maxNo;
+  if maxNo is null then
+     maxNo := yearCodeLast||officeCode||'0000000000';--如果为空给他加一个起始值，方便直接往后加
+  end if;
+  --4、计算向后使用多少版（必然能除尽，按正整数来考虑）
+  countPieceNum := printCount/pieceTagNum;
+  sNum := maxNo + 1;
+  eNum := sNum + countPieceNum - 1;
+  
+  --5、插入数据
+  if authType = 1 or authType = 2 then
+    mathLength :=9;
+  else
+    mathLength :=11;
+  end if;
+  sql_txt1 := 'insert into  '||tableName||' (PIECE_NUM,BEGIN_NUM,END_NUM,TAG_ID,OFFICE_ID,PRINT_ORDER_ID,status)
+      select to_number(id) + to_number('||maxNo||')+1,
+       substr('''||beginNum||''',0,instr('''||beginNum||''',''-'',1,1))||lpad(to_number(substr('''||beginNum||''',instr('''||beginNum||''',''-'',1,1)+1,length('''||beginNum||'''))) + to_number(id) * to_number('||pieceTagNum||'),'||mathLength||',0),
+       substr('''||beginNum||''',0,instr('''||beginNum||''',''-'',1,1))||lpad(to_number(substr('''||beginNum||''',instr('''||beginNum||''',''-'',1,1)+1,length('''||beginNum||'''))) + (to_number(id) + 1) * to_number('||pieceTagNum||') - 1,'||mathLength||',0),
+       '''||tagId||''' ,'''||officeId||''','''||printOrderId||''',''0'' from t_ba_code where id < '||countPieceNum||' and id >= 0'; 
+      
+     execute immediate  sql_txt1;
+      result := sNum;
+      result2 := eNum;
+  commit;
+end PRO_INSERT_PIECE_NUM;
+
+==========================JAVA======================================
+
+	Map<String, String> codeMap = new HashMap<String, String>();
+			codeMap.put("yearCode",cal.get(Calendar.YEAR)+"");//年份
+			codeMap.put("officeCode", officeCode);//机构码
+			codeMap.put("authType",authType);//认证类型
+			codeMap.put("tagId",tagId);//标签id
+			codeMap.put("printOrderId",printOrderId);//印刷单号
+			codeMap.put("printCount", printOrder.getPrintCount()+"");//印刷数量
+			codeMap.put("createBy", UserUtils.getUser().getId());
+			codeMap.put("result","");//返回结果
+			codeMap.put("result2","");
+			//生成码的存储过程
+			codeDao.callProcedure(codeMap);
+
+
+
+
+	//调用存储过程，生成根据选择的标签规格在新建的版号表中插入版号和流水号段的对应关系，下单后系统自动记录起始版号
+			Map<String, String> codeMap2 = new HashMap<String, String>();
+			codeMap2.put("yearCode",cal.get(Calendar.YEAR)+"");//年份
+			codeMap2.put("tagId",tagId);//标签id
+			codeMap2.put("officeCode", myOffice.getCode());//印刷订单的机构的机构码
+			codeMap2.put("officeId", myOffice.getId());//印刷订单的机构id
+			codeMap2.put("printCount", printOrder.getPrintCount()+"");//印刷数量
+			TagDict tagDict = tBzTagDictDao.get(tagId);
+			codeMap2.put("pieceTagNum",tagDict.getPieceTagNum());//每包的版数
+			codeMap2.put("beginNum", codeMap.get("result"));
+			codeMap2.put("authType",authType);//认证类型
+			codeMap2.put("printOrderId",printOrder.getId());//订单ID
+			codeMap2.put("result","");//返回结果
+			codeMap2.put("result2","");
+			codeDao.callPieceNum(codeMap2);
+=======================Mybatis=====================================
+ <select id="callProcedure" statementType="CALLABLE" resultType="String" parameterType="java.util.Map">
+        <![CDATA[
+        {CALL PRO_INSERT_CODE(
+            #{yearCode,mode=IN,jdbcType=VARCHAR},
+            #{officeCode,mode=IN,jdbcType=VARCHAR},
+            #{authType,mode=IN,jdbcType=VARCHAR},
+            #{tagId,mode=IN,jdbcType=VARCHAR},
+            #{printOrderId,mode=IN,jdbcType=VARCHAR},
+            #{printCount,mode=IN,jdbcType=VARCHAR},
+            #{createBy,mode=IN,jdbcType=VARCHAR},
+            #{result,mode=OUT,jdbcType=VARCHAR},
+            #{result2,mode=OUT,jdbcType=VARCHAR}
+        )}
+        ]]>
+    </select>
+    
+    <select id="callPieceNum" statementType="CALLABLE" resultType="String" parameterType="java.util.Map">
+        <![CDATA[
+        {CALL PRO_INSERT_PIECE_NUM(
+            #{yearCode,mode=IN,jdbcType=VARCHAR},
+            #{tagId,mode=IN,jdbcType=VARCHAR},
+            #{officeCode,mode=IN,jdbcType=VARCHAR},
+            #{printCount,mode=IN,jdbcType=VARCHAR},
+            #{pieceTagNum,mode=IN,jdbcType=VARCHAR},
+            #{beginNum,mode=IN,jdbcType=VARCHAR},
+            #{authType,mode=IN,jdbcType=VARCHAR},
+            #{officeId,mode=IN,jdbcType=VARCHAR},
+            #{printOrderId,mode=IN,jdbcType=VARCHAR},
+            #{result,mode=OUT,jdbcType=VARCHAR},
+            #{result2,mode=OUT,jdbcType=VARCHAR}
+        )}
+        ]]>
+    </select>
