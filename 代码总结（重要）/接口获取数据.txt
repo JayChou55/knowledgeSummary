@@ -1,0 +1,107 @@
+   
+    public static String getExportUserName(String ipUrl)
+    {
+        String lines = "";
+        try
+        {
+            // 创建链接
+            URL url = new URL(ipUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("GET");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+            connection.connect();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            // 转码
+            lines = readStrByCode(connection.getInputStream(), "GBK");
+
+            reader.close();
+            // 断开连接
+            connection.disconnect();
+        }
+
+        catch (Exception e)
+        {
+
+            return "";
+        }
+        return lines;
+    }
+        // 乱码处理
+        public static String readStrByCode(InputStream is, String code)
+        {
+            StringBuilder builder = new StringBuilder();
+            BufferedReader reader = null;
+
+            try
+            {
+                reader = new BufferedReader(new InputStreamReader(is, code));
+                String line;
+                while ((line = reader.readLine()) != null)
+                {
+                    builder.append(line + "\n");
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            return builder.toString().trim();
+        }
+		
+		
+		
+		
+		
+		
+	
+                    						String ipurl="http://whois.pconline.com.cn/ipJson.jsp?ip="+ip;
+                    						System.out.println("开始根据ip获取地址"+new Date());
+                    						String ipAdd = getExportUserName(ipurl);
+                    						System.out.println("完成根据ip获取地址，"+new Date()+"返回结果："+ipAdd);
+                    						JSONObject obj = JSONObject.fromObject(ipAdd.substring(34, ipAdd.length() - 3));
+                    						String region = obj.getString("pro");
+                    						String address = obj.getString("city");
+
+											String xpString="http://api.map.baidu.com/location/ip?ip="+"223.104.147.36"+"&ak=ZQ7iVYqyhSk1DBBsACv5dGIeRo9cdOz1&coor=bd09ll";
+											String xy = getExportUserName(xpString);
+											JSONObject obj2 = JSONObject.fromObject(xy);
+											JSONObject obj3 = obj2.getJSONObject("content");
+											JSONObject obj4 = obj3.getJSONObject("point");
+											String x = obj4.getString("x");
+											String y = obj4.getString("y");
+
+											tBzQueryStaff.setX(x);
+											tBzQueryStaff.setY(y);
+
+                    						tBzQueryStaff.setAddress(address);
+                    						tBzQueryStaff.setRegion(region);
+                    						tBzQueryStaff.setCreateDate(new Date());	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

@@ -1,0 +1,29 @@
+1.创建临时表空间
+	create temporary tablespace bhz_temp tempfile 'D:\oracleSpace\bhz_temp_01_20151130.dbf' size 100m autoextend on next 50m maxsize 200m;
+	--drop tablespace bhz_temp including contents and datafiles;
+2.创建表空间	
+	create  tablespace bhz tempfile 'D:\oracleSpace\bhz_01_20151130.dbf' size 200m autoextend on next 100m maxsize 400m;
+	--drop tablespace bhz including contents and datafiles;
+	--alter tabkespace bhz add datafile 'D:\oracleSpace\bhz_0220151130.dbf' size 200m autoextend on;
+	
+	
+ alter tablespace ts add datafile '/u01/oradata/ts/businesscode1706.dbf' si^H                                                                   
+  
+ alter tablespace BUSINESSCODE add datafile '/u01/oradata/ts/businesscode1706.dbf' size 30000m;
+
+3.创建用户并指定表空间
+	create user bhz identified by bhz default tablespace bhz temporary tablespace bhz_temp;
+4.创建用户
+	create user bhz idetified by bhz default tablespace bhz temporary tablespace bhz_temp;
+5.赋权
+	grant dba to bhz;	
+	
+6.范围分区（时间）
+	create table t_part(obect_id int,object_name varchar2(1000) partition by range(object_id))
+	(
+		partition p1 values less than(1000),
+		partition p2 values less than(2000),
+		partition p3 values less than(3000),
+		partition p4 values less than(4000),
+		partition p1 values less than(maxvalue)
+	)	

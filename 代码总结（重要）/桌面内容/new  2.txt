@@ -1,0 +1,7 @@
+create or repalce procedure username (id in sys_user.id%type,name sys_user.name%type) is
+begin
+ select name into name where id = id;
+ if(name!='1')
+			then
+			dbms_output.put_line('员工号不存在，请输入正确的员工号。'); 
+end;

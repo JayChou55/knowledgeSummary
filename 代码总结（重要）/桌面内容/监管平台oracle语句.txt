@@ -1,0 +1,35 @@
+select count(*) from t_bz_query_staff where use_type='1';
+
+select count(*) from T_BZ_STANDARD_MARK_RECORD;
+
+select count(*) from T_BZ_CODE_2017_6;
+
+select count(*) from T_BZ_CODE_2017_7;
+
+select sum(a.number_count) from t_bz_pro_batch_record a where a.status='0';
+
+
+select ltrim(to_char(create_date,'mm'),'0') month,b.month, sum(a.number_count)
+from t_bz_pro_batch_record a
+right
+join (select level month from dual
+connect by level<13) b on  ltrim(to_char(a.create_date,'mm'),'0')=to_char(b.month)
+group by to_char(create_date,'mm') ,b.month
+order by b.month;
+  
+   select ltrim(to_char(create_date,'mm'),'0') month
+from t_bz_pro_batch_record a
+right join (select level month from dual
+connect by level<13) b
+on ltrim(to_char(create_date,'mm'),'0') = b.month
+group by create_date
+;
+
+
+ select to_char(sysdate,'fmmm-dd') from dual;
+ 
+ 
+ 
+ 
+select level mymonth from dual
+connect by level<13;

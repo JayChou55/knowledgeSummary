@@ -1,0 +1,33 @@
+Broker：相当于Activemq应用实例
+
+配置：
+	<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+	</dependency>
+
+	<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>5.11.2</version>
+	</dependency>
+
+访问模式 修改activemq.xml
+udp
+tcp
+nio
+uri
+vm:broker
+nio访问模式
+	<transprtConnector name="nio" uri="nio://localhost:61618?trace=true" />
+
+ActiveMQ消息存储
+	1.文件存储，以前默认的
+	2.KahaDB消息存储，提供容量提升和恢复能力，默认存储。用一个事务日志和一个索引文件存储它所有的地址。数据被追加到data log中，不需要清除。 
+		<persistenceAdapter>
+			<kahaDB directory ="${activemq.data}/kahadb" />
+		</persistenceAdapter>
+
+	3.JDBC消息存储，基于JDBC存储
+	4.Memory 消息存储，基于内存的消息存储

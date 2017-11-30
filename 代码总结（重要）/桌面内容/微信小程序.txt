@@ -1,0 +1,15 @@
+目录结构（js是入口，wxml是页面ui）
+	pages
+		index
+			indx.js	Pages命令
+			index.wxml
+			index.wxss
+		logs
+			logs.js
+			logs.json
+			logs.wxml
+			logs.wxss
+	utils
+		util.js
+	app.js（定义项目启动入口）App命令
+	app.json:"pages"：是项目每个页面

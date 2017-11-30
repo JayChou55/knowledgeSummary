@@ -1,0 +1,15 @@
+select k1 选择库
+
+
+set str1 12345
+get str1
+
+incr st1
+decr str1
+
+ttl str1 (查看有效期)
+	-1：永久有效 -2不存在
+
+key* 查看所有key
+
+expire k3 10 设置k3失效时间10秒

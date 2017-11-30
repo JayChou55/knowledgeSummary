@@ -1,0 +1,33 @@
+分模块、分工程管理-1
+1：在总的web的pom里面，加入要合并的war内容，示例如下：
+ <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-war-plugin</artifactId>
+	<version>2.2</version>
+	<configuration>
+		<overlays>
+			<overlay>
+				<groupId>com.sishuok</groupId>
+				<artifactId>customermgr</artifactId>
+			</overlay>
+			<overlay>
+				<groupId>com.sishuok</groupId>
+				<artifactId>goodsmgrweb</artifactId>
+			</overlay>
+		</overlays>
+	</configuration>
+ </plugin>
+分模块、分工程管理-2
+2：在总的web的pom里面，加入要合并的war的依赖，示例如下：
+<dependency>
+	<groupId>com.sishuok</groupId>
+	<artifactId>customermgr</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<type>war</type>
+</dependency>
+<dependency>
+	<groupId>com.sishuok</groupId>
+	<artifactId>goodsmgrweb</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<type>war</type>
+</dependency>

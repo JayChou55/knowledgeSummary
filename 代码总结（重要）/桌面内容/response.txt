@@ -1,0 +1,45 @@
+response 设置响应头的常用几种方法
+
+1.Location  的用法
+
+
+response.setStatus(302)//临时定向响应码
+
+response.setHeader("Location", "/day03_00_ResponseHeader/servlet/ResponseHeaderDemo2");///day03_00_ResponseHeader/servlet/ResponseHeaderDemo2 代表转向的地址
+
+
+
+
+2.response.setHeader("Content-Encoding", "gzip"); //告诉响应头以gzip 格式解码
+
+再输入输出流的时候用GZIPOutputStream  缩小文件的大小。
+
+
+
+
+3.//刷新Refersh
+
+ response.setHeader("Refresh", "3;url=http://www.baidu.com"); //告诉客户端 三秒后刷新
+
+
+
+
+4.Content-Disposition ////通知客户端已下载的方式接受数据
+
+
+response.setHeader("Content-Disposition", "attachment;filename=2.jpg");
+
+
+
+
+5.Content-Type//告知客户端响应正文类型
+response.setHeader("Content-Type", "application/octet-stream");
+
+6. Expires 控制缓存
+
+        //控制浏览器不要缓存
+        response.setHeader("Expires", "-1");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Pragma",  "no-cache");
+
+     //控制缓存时间 response.setDateHeader("Expires", System.currentTimeMillis()+1*60*60*1000);

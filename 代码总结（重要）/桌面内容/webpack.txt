@@ -1,0 +1,84 @@
+环境配置
+	1.node.js安装后，会自动安装npm
+	npm更新：Linux:sudo npm install npm --global
+			 windows:npm install npm --global	
+	npm 全局安装
+		npm install forever -g
+	npm 删除
+		npm uninstall forever -g(全局"-g"除npm的forever包)
+	npm安装项目的package
+		如：cd 进入对应项目后，npm install underscore
+	npm查看项目安装的包
+		npm list ;npm ls
+
+	package.json 该文件描述了项目的基本信息以及一些第三方依赖项（插件）。
+		可以手工建立这个文件 或者 进入项目根目录命令：npm init
+		dependeceies:项目依赖
+		devDependencies:项目开发依赖时需要的package
+		
+		新项目，可以npm install直接安装所有dependeceies和devDependencies中的依赖包，进node_module
+		
+		npm install underscore --save 可以把这个包放入dependeceies中
+		npm install babel-cli --save-dev 项目开发时候依赖包
+		删除 rm -rf node_modules 后，npm list 查看，npm install 根据package下面的依赖进行安装对应的包，生成对应的 node_modules
+		如果想去掉对应安装的包，并且从package.json中的dependceies去掉，则可以使用如：npm unistall underscore --save
+		更新项目本地安装的包，如查看gulp这个包的所有版本：npm info gulp	安装对应的版本，npm install gulp@2.0.0 --save-dev
+		可以查看有新版本的包的版本情况npm outdated
+		 "babel-eslint": "^7.1.1" "^"表示只能更新版本号里面的第二位数字，"~"表示第三位数字，"*"始终最新
+		npm update 更新包
+		安装 npm install nrm -global,使用国内源的安装包
+ 		nrm ls 查看源，带"*"是当前使用的源
+		nrm test 测试安装源的速度
+		切换源：nrm use taobao,使用淘宝源
+		
+		"scripts": {
+		"start": "webpack-dev-server --config webpack.dev.config.js",
+		"build": "webpack --config webpack.pro.config.js --display-error-details --progress --profile --colors"
+	  }这是node的命令,webpack-dev-server启动8080服务，
+		module.exports = {
+		  entry: entrys,
+		  output: {
+			path: BUILD_PATH,
+			filename: "[name].[hash].js",
+			},输出
+		
+		 resolve: {}设置后缀
+		 
+		modulers：{
+			loaders:[{
+				test:/\.(js|jsx)$/,exclude:/node_modules/,loader:'babel'
+			}]} 
+		 加载时js|jsx结尾用babel加载，node_modules不加载
+		
+		plugin：[]是插件
+		
+		less是css的语法糖，可以更高效低冗余的写css
+	
+	webpack 
+		const webpack = require("webpack");查找node_module下的webpack包下的package.json
+		npm install webpack webpack-dev-server
+	babel
+		npm uninstall babel-cli --global
+		npm install babel-cli --save-dev
+		
+	react 
+		npm i react react-dom -save 安装
+
+		
+		
+	ES6
+		let是块变量{}
+		const是衡量，
+		
+		
+安装插件
+	已知我们将使用 webpack 作为构建工具，那么就需要安装相应插件，运行 npm install webpack webpack-dev-server --save-dev 来安装两个插件。
+	又已知我们将使用 React ，也需要安装相应插件，运行 npm i react react-dom --save来安装两个插件。其中i是install的简写形式。
+	安装完成之后，查看package.json可看到多了devDependencies和dependencies两项，根目录也多了一个node_modules文件夹。
+	--save 和 --save-dev 的区别
+	npm i时使用--save和--save-dev，可分别将依赖（插件）记录到package.json中的dependencies和devDependencies下面。
+	dependencies下记录的是项目在运行时必须依赖的插件，常见的例如react jquery等，即及时项目打包好了、上线了，这些也是需要用的，否则程序无法正常执行。
+	devDependencies下记录的是项目在开发过程中使用的插件，例如这里我们开发过程中需要使用webpack打包，而我在工作中使用fis3打包，
+	但是一旦项目打包发布、上线了之后，webpack和fis3就都没有用了，可卸磨杀驴。
+	延伸一下，我们的项目有package.json，其他我们用的项目如webpack也有package.json，见./node_modules/webpack/package.json，其中也有devDependencies和dependencies。当我们使用npm i webpack时，./node_modules/webpack/package.json中的dependencies会被 npm 安装上，而devDependencies也没必要安装。
+

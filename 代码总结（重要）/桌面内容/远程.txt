@@ -1,0 +1,1 @@
+mstsc /admin     longwin@123lw

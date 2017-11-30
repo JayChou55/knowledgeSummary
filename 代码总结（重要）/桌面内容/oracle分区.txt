@@ -1,0 +1,8 @@
+范围分区
+哈希分区
+列表分区
+
+
+SQL>  alter tablespace ts add datafile '/u01/oradata/ts/businesscode1706.dbf' si^H                                                                   
+  2  
+SQL>  alter tablespace BUSINESSCODE add datafile '/u01/oradata/ts/businesscode1706.dbf' size 30000m;

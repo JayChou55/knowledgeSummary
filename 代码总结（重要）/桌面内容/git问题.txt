@@ -1,0 +1,69 @@
+关于ssh连接主机，git连接github失败的问题  
+    问题：$ ssh -T git@github.com  
+        Permission denied (publickey)  
+  
+解析：  
+    1、可以看出问题出在publickey(公钥)  
+    2、接着ssh -T -v git@github.com 看下具体信息  
+  
+penSSH_6.1p1 Debian-4, OpenSSL 1.0.1c 10 May 2012  
+debug1: Reading configuration data /etc/ssh/ssh_config  
+debug1: /etc/ssh/ssh_config line 19: Applying options for *  
+debug1: Connecting to github.com [192.30.252.131] port 22.  
+debug1: Connection established.  
+debug1: identity file /home/sunny/.ssh/id_rsa type -1  
+debug1: identity file /home/sunny/.ssh/id_rsa-cert type -1  
+debug1: identity file /home/sunny/.ssh/id_dsa type -1  
+debug1: identity file /home/sunny/.ssh/id_dsa-cert type -1  
+debug1: identity file /home/sunny/.ssh/id_ecdsa type -1  
+debug1: identity file /home/sunny/.ssh/id_ecdsa-cert type -1  
+debug1: Remote protocol version 2.0, remote software version OpenSSH_5.9p1 Debian-5ubuntu1+github5  
+debug1: match: OpenSSH_5.9p1 Debian-5ubuntu1+github5 pat OpenSSH_5*  
+debug1: Enabling compatibility mode for protocol 2.0  
+debug1: Local version string SSH-2.0-OpenSSH_6.1p1 Debian-4  
+debug1: SSH2_MSG_KEXINIT sent  
+debug1: SSH2_MSG_KEXINIT received  
+debug1: kex: server->client aes128-ctr hmac-md5 none  
+debug1: kex: client->server aes128-ctr hmac-md5 none  
+debug1: sending SSH2_MSG_KEX_ECDH_INIT  
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY  
+debug1: Server host key: RSA 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48  
+debug1: Host 'github.com' is known and matches the RSA host key.  
+debug1: Found key in /home/sunny/.ssh/known_hosts:1  
+debug1: ssh_rsa_verify: signature correct  
+debug1: SSH2_MSG_NEWKEYS sent  
+debug1: expecting SSH2_MSG_NEWKEYS  
+debug1: SSH2_MSG_NEWKEYS received  
+debug1: Roaming not allowed by server  
+debug1: SSH2_MSG_SERVICE_REQUEST sent  
+debug1: SSH2_MSG_SERVICE_ACCEPT received  
+debug1: Authentications that can continue: publickey  
+debug1: Next authentication method: publickey  
+debug1: Trying private key: /home/sunny/.ssh/id_rsa  
+debug1: Trying private key: /home/sunny/.ssh/id_dsa  
+debug1: Trying private key: /home/sunny/.ssh/id_ecdsa  
+debug1: No more authentication methods to try.  
+Permission denied (publickey).  
+  
+    3、可以发现在一下几行出现问题：  
+    debug1: Next authentication method: publickey  
+    debug1: Trying private key: /home/sunny/.ssh/id_rsa  
+    debug1: Trying private key: /home/sunny/.ssh/id_dsa  
+    debug1: Trying private key: /home/sunny/.ssh/id_ecdsa  
+    debug1: No more authentication methods to try.  
+    Permission denied (publickey).  
+  
+    4、发现它一直在查找id_rsa、id_dsa、id_ecdsa这三个文件，然后就不尝试其他了;  
+    5、我们查看下 ~/.ssh文件夹下的文件：ls ~/.ssh  
+        github  github.pub ...  
+    这里没有第4步出现的文件，github是创建ssh-key时输入的名字  
+  
+    6、现在我们让~/.ssh文件夹下,还原当初没有改时的名字id_rsa  
+        cp github id_rsa && cp gitbub.pub id_rsa.pub  
+  
+    7、再次尝试连接:ssh -T git@github.com  
+    Hi xxx ! You've successfully authenticated, but GitHub does not provide shell access.成功。
+	
+	
+	总结：  
+    运用shh -T -v git@github.com查看具体出错信息，再根据信息来调试 ,其实就是改名

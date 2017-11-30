@@ -1,0 +1,185 @@
+SSH Secure Shell 3.2.9 (Build 283)
+Copyright (c) 2000-2003 SSH Communications Security Corp - http://www.ssh.com/
+
+This copy of SSH Secure Shell is a non-commercial version.
+This version does not include PKI and PKCS #11 functionality.
+
+
+Last login: Tue Jul  4 19:20:01 2017 from 172.16.88.54
+SUSEORA11GUTF8:~ # su - oracle
+oracle@SUSEORA11GUTF8:~> lsnrctl stop
+
+LSNRCTL for Linux: Version 11.2.0.4.0 - Production on 05-JUL-2017 15:21:47
+
+Copyright (c) 1991, 2013, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=SUSEORA11GUTF8)(PORT=1521)))
+The command completed successfully
+oracle@SUSEORA11GUTF8:~> ps -ef|grep $ORACLE_SID|grep -v ora_|grep LOCAL=NO|awk '{print $2}'|xargs kill
+oracle@SUSEORA11GUTF8:~> sqplus /nology
+If 'sqplus' is not a typo you can run the following command to lookup the package that contains the binary:
+    command-not-found sqplus
+-bash: sqplus: command not found
+oracle@SUSEORA11GUTF8:~> sqlplus /nology
+
+SQL*Plus: Release 11.2.0.4.0 Production on Wed Jul 5 15:22:55 2017
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+
+SQL*Plus: Release 11.2.0.4.0 Production
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+Use SQL*Plus to execute SQL, PL/SQL and SQL*Plus statements.
+
+Usage 1: sqlplus -H | -V
+
+    -H             Displays the SQL*Plus version and the
+                   usage help.
+    -V             Displays the SQL*Plus version.
+
+Usage 2: sqlplus [ [<option>] [{logon | /nolog}] [<start>] ]
+
+  <option> is: [-C <version>] [-L] [-M "<options>"] [-R <level>] [-S]
+
+    -C <version>   Sets the compatibility of affected commands to the
+                   version specified by <version>.  The version has
+                   the form "x.y[.z]".  For example, -C 10.2.0
+    -L             Attempts to log on just once, instead of
+                   reprompting on error.
+    -M "<options>" Sets automatic HTML markup of output.  The options
+                   have the form:
+                   HTML [ON|OFF] [HEAD text] [BODY text] [TABLE text]
+                   [ENTMAP {ON|OFF}] [SPOOL {ON|OFF}] [PRE[FORMAT] {ON|OFF}]
+    -R <level>     Sets restricted mode to disable SQL*Plus commands
+                   that interact with the file system.  The level can
+                   be 1, 2 or 3.  The most restrictive is -R 3 which
+                   disables all user commands interacting with the
+                   file system.
+    -S             Sets silent mode which suppresses the display of
+                   the SQL*Plus banner, prompts, and echoing of
+                   commands.
+
+  <logon> is: {<username>[/<password>][@<connect_identifier>] | / }
+              [AS {SYSDBA | SYSOPER | SYSASM}] [EDITION=value]
+
+    Specifies the database account username, password and connect
+    identifier for the database connection.  Without a connect
+    identifier, SQL*Plus connects to the default database.
+
+    The AS SYSDBA, AS SYSOPER and AS SYSASM  options are database
+    administration privileges.
+
+    <connect_identifier> can be in the form of Net Service Name
+    or Easy Connect.
+
+      @[<net_service_name> | [//]Host[:Port]/<service_name>]
+
+        <net_service_name> is a simple name for a service that resolves
+        to a connect descriptor.
+
+        Example: Connect to database using Net Service Name and the
+                 database net service name is ORCL.
+
+           sqlplus myusername/mypassword@ORCL
+
+        Host specifies the host name or IP address of the database
+        server computer.
+
+        Port specifies the listening port on the database server.
+
+        <service_name> specifies the service name of the database you
+        want to access.
+
+        Example: Connect to database using Easy Connect and the
+                 Service name is ORCL.
+
+           sqlplus myusername/mypassword@Host/ORCL
+
+    The /NOLOG option starts SQL*Plus without connecting to a
+    database.
+
+    The EDITION specifies the value for Session Edition.
+
+
+  <start> is: @<URL>|<filename>[.<ext>] [<parameter> ...]
+
+    Runs the specified SQL*Plus script from a web server (URL) or the
+    local file system (filename.ext) with specified parameters that
+    will be assigned to substitution variables in the script.
+
+When SQL*Plus starts, and after CONNECT commands, the site profile
+(e.g. $ORACLE_HOME/sqlplus/admin/glogin.sql) and the user profile
+(e.g. login.sql in the working directory) are run.  The files may
+contain SQL*Plus commands.
+
+Refer to the SQL*Plus User's Guide and Reference for more information.
+oracle@SUSEORA11GUTF8:~> sqlplus /nolog
+
+SQL*Plus: Release 11.2.0.4.0 Production on Wed Jul 5 15:23:41 2017
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+SQL> connect / as sysdba
+Connected.
+SQL> shutdown immediate
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> exit
+Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+oracle@SUSEORA11GUTF8:~> lsnrctl start
+
+LSNRCTL for Linux: Version 11.2.0.4.0 - Production on 05-JUL-2017 15:25:48
+
+Copyright (c) 1991, 2013, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/11.2.0/db_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 11.2.0.4.0 - Production
+System parameter file is /u01/app/oracle/product/11.2.0/db_1/network/admin/listener.ora
+Log messages written to /u01/app/diag/tnslsnr/SUSEORA11GUTF8/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=SUSEORA11GUTF8)(PORT=1521)))
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=SUSEORA11GUTF8)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 11.2.0.4.0 - Production
+Start Date                05-JUL-2017 15:25:48
+Uptime                    0 days 0 hr. 0 min. 0 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/11.2.0/db_1/network/admin/listener.ora
+Listener Log File         /u01/app/diag/tnslsnr/SUSEORA11GUTF8/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=SUSEORA11GUTF8)(PORT=1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+The listener supports no services
+The command completed successfully
+oracle@SUSEORA11GUTF8:~> sqlplus /nolog
+
+SQL*Plus: Release 11.2.0.4.0 Production on Wed Jul 5 15:26:09 2017
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+SQL> connect/as sysdba
+Connected to an idle instance.
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 4893917184 bytes
+Fixed Size                  2261488 bytes
+Variable Size            1107299856 bytes
+Database Buffers         3774873600 bytes
+Redo Buffers                9482240 bytes
+Database mounted.
+Database opened.
+SQL> exit
+Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+oracle@SUSEORA11GUTF8:~> 
