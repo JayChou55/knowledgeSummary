@@ -1,0 +1,26 @@
+create or replace procedure proc_test(
+--参数区域
+)
+is 
+--变量区域
+    --sql脚本
+    v_sql varchar2(2000) :='';
+    --记录学生数量
+    v_num number;
+begin
+--执行区域
+
+    -- execute immediate用法1：立刻执行sql语句
+    v_sql := 'create or replace view myview as select id,name from student';
+    execute immediate v_sql;
+    
+    --- execute immediate用法2：立刻执行sql语句，并赋值给某个变量
+    v_sql := 'select count(1) from student';
+    execute immediate v_sql into v_num;
+    
+    -- execute immediate用法3：带参数的sql
+    v_sql:='select * from student t where t.name=:1 and t.age=:2'; 
+    execute immediate v_sql using 'ZhangSan',23;
+    
+end proc_test;
+/

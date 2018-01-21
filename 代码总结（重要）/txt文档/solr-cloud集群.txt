@@ -1,0 +1,92 @@
+======================zookeeper集群==========================================
+1.创建solr-cloud文件夹
+	mkdir solr-cloud
+2.解压zookeeper文件后复制3分到solr-cloud下
+	tar zxf zookeeper-3.4.6.tar.gz 
+	cp -r zookeeper-3.4.6 /home/shop/solr-cloud/zookeeper01
+ 	cp -r ./zookeeper01 zookeeper02
+	cp -r ./zookeeper01 zookeeper03
+3.创建创建data文件夹，并创建一个myid的文件，并编辑内容:1,用以区分
+	mkdir data
+	touch myid
+	vim myid 编辑1
+	cat myid
+4.进入conf文件夹，编辑zoo_sample.cfg,重命名
+	mv zoo_sample.cfg zoo.cfg
+5.编辑zoo.cfg
+	vim后，dataDir路径修改为3部data路径
+	修改clientPort=2181 （第二个就是2182,类推...）
+	最后再添加：
+		server.1=192.168.239.128:2881:3881
+		server.2=192.168.239.128:2882:3882
+		server.3=192.168.239.128:2883:3883
+6.第3,4,5步重复操作到zookeeper01 02 03下
+7.启动每个节点，写个批处理
+	vim start-zookeeper.sh 写入：
+	cd zookeeper01/bin
+	./zkServer.sh start
+	cd ../../
+	cd zookeeper02/bin
+	./zkServer.sh start
+	cd ../../
+	cd zookeeper03/bin
+	./zkServer.sh start
+	cd ../../
+8.更改此批处理权限,之后运行便可
+	chmod u+x start-zookeeper.sh
+
+================================solr集群=============================================
+
+1.复制之前solr里的tomcat（安装配置了solr的tomcat，具体配置可参考solr部署）
+	cp -r tomcat01 ./tomcat01
+	cp -r tomcat01 ./tomcat02
+	cp -r tomcat01 ./tomcat03
+	cp -r tomcat01 ./tomcat04
+2.复制之前的solr的war包生成的文件夹
+	cp -r  ./solr/apache-tomcat-8.5.5/webapps/solr /home/shop/solr-cloud/tomcat01/webapps/
+	cp -r  ./solr/apache-tomcat-8.5.5/webapps/solr /home/shop/solr-cloud/tomcat02/webapps/
+	cp -r  ./solr/apache-tomcat-8.5.5/webapps/solr /home/shop/solr-cloud/tomcat03/webapps/
+	cp -r  ./solr/apache-tomcat-8.5.5/webapps/solr /home/shop/solr-cloud/tomcat04/webapps/
+
+
+3.修改tomcat01、02、03、04配置
+	vim ./tomcat04/conf/server.xml 
+	修改每个文件其中3个port为81xx 82xx 83xx 84xx规律
+4.复制solrhome到solr-cloud下
+	具体配置可参考solr部署
+5.修改solrhome中solr.xml
+	host:本机的ip地址如：192.168.239.128
+	hostPort:8180(port是server.xml设置的)
+6.建立每个tomcat与solrhome之间的关联，修改每个tomcat的solr下的web.xml里面solrhomei地址
+ 	<env-entry>
+      	  <env-entry-name>solr/home</env-entry-name>
+     	  <env-entry-value>/home/shop/solr-cloud/solrhome01/</env-entry-value>(按此分别修改01,02,03,04)
+      	  <env-entry-type>java.lang.String</env-entry-type>
+   	 </env-entry>
+7.修改tomcat下bin中catalina.sh,把tomcat与zookeeper集群关联
+	# org.apache.catalina.security.SecurityListener
+	#JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
+	JAVA_OPTS="-DzkHost=192.168.239.128:2181,192.168.239.128:2182,192.168.239.128:2183" 《===此处为添加内容
+	（依次按此，更改对应4个tomcat的内容）
+8.上传一份solrhome中的conf文件夹到zookeeper中，利用solr安装包内的example/scripts/cloud-scripts/zkcli.sh
+	./zkcli.sh -zkhost 192.168.239.128:2181,192.168.239.128:2182,192.168.239.128:2183 -cmd upconfig -confdir /home/shop/solr-cloud/solrhome01/collection1/conf/ -confname myconf
+
+9.查看是否上传成功
+	进入solr-cloud下的zookeeper/bin
+	./zkCli.sh	
+10.连接zookeeper的命令：
+	./zkCli.sh -server 192.168.239.128:2182
+
+11. ls /configs查看上传文件
+12.退出
+	quit
+13.建立tomcat批处理启动文件
+	vim start-tomcat.sh
+	写入：
+	/home/shop/solr-cloud/tomcat01/bin/startup.sh
+	/home/shop/solr-cloud/tomcat02/bin/startup.sh
+	/home/shop/solr-cloud/tomcat03/bin/startup.sh
+	/home/shop/solr-cloud/tomcat04/bin/startup.sh
+	更改启动权限：
+	chmod +x start-tomcat.sh
+

@@ -1,0 +1,73 @@
+tar zxvf 。。。jdk.tar.gz -C /usr/java
+
+
+1.执行命令vim /etc/profile编辑profile文件。i：插入。shift+：==》wq!保存退出
+
+2.在/etc/profile底部加入如下内容：
+
+JAVA_HOME=/usr/java/jdk1.8.0_60
+
+PATH=$JAVA_HOME/bin:$PATH
+
+CLASSPATH=$JAVA_HOME/jre/lib/ext:$JAVA_HOME/lib/tools.jar
+
+export PATH JAVA_HOME CLASSPATH
+
+
+3.以上，环境变量配置完成。需要注意的是，PATH在配置的时候，一定要把$JAVA_HOME/bin放在前面，不然使用java命令时，系统会找到以前 的java，再不往下找了。这样java这个可执行文件运行的目录其实不在$JAVA_HOME/bin下，而在其它目录下，会造成很大的问题。
+
+4.执行命令source /etc/profile让profile文件立即生效。
+
+命令测试
+
+1.使用javac命令，不会出现command not found错误。
+
+2.使用java -version，出现版本为java version "1.8.0_60"。
+
+3.看看自己的配置是否都正确。
+
+echo $JAVA_HOME
+
+echo $CLASSPATH
+
+echo $PATH
+
+代码测试
+
+在自己的工作目录下创建新的文件Hello.java。写入如下内容：
+
+public class Hello{    
+    public static void main(String[] args){    
+        System.out.println("Hello World");    
+    }    
+ }
+
+执行命令如下，如果得到以下结果，说明jdk安装完成。 
+
+# javac Hello.java    
+# java -cp . Hello
+
+Hello World
+
+当然，我们安装的jdk8，应该测试下jdk8的特性。可以使用jdk8特有的stream来测试，代码如下：
+
+import java.util.Arrays;  
+import java.util.Iterator;    
+import java.util.List;    
+import java.util.function.Consumer;    
+import java.util.function.Function;    
+import java.util.function.Predicate;
+public class TestLambda {      
+    public static void main(String[] args) {                
+        // Aggregate Operations            
+        List<String> myList = Arrays.asList("zhangsan", "lisi", "wangwu",
+            "liuliu");            
+        myList.stream().filter(x -> x.contains("a")).map(x -> x.toUpperCase())  
+            .forEach(x -> System.out.println(x));
+    }
+}
+
+使用以下命令运行，得到结果，说明安装没有问题。 
+
+# javac TestLambda.java    
+# java -cp . TestLambda

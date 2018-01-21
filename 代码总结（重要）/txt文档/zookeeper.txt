@@ -1,0 +1,18 @@
+1.解压后，创建data文件夹在zookper目录
+	mkdir data
+2.进入conf，改名zoo_sample.cfg  zoo.cfg	
+	mv zoo_sample.cfg zoo.cfg
+3.把zookeeper文件夹放入位置（mv zookper xx/xx/zookper）编辑zoo.cfg
+	vim zoo.cfg 修改dataDir 例如位置：/home/shop/zookeeper-3.4.6/data
+4.进入bin目录启动
+	./zkServer.sh start
+5.查看启动状态
+	./zkServer.sh status
+6.关闭	
+	./zkServer.sh stop
+
+7.监控中心解压后复制到tomcat/webapp/
+	cp dubbo-admin tomcat/webapps/
+8.查看tomcat日志
+	tail -f logs/catalina.out
+9.如果，监控中心不在一个电脑上，修改dubbo-admin（监控中心），进入web-inf 然后修改dubbo.properties address

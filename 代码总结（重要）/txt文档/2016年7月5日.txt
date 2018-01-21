@@ -1,0 +1,38 @@
+ series: [  
+                    {  
+                        //系列名称，如果启用legend，该值将被legend.data索引相关  
+                        name: '入驻企业数量',  
+                        //图表类型，必要参数！如为空或不支持类型，则该系列数据不被显示。  
+                        type: 'bar',  
+                        //系列中的数据内容数组，折线图以及柱状图时数组长度等于所使用类目轴文本标签数组axis.data的长度，并且他们间是一一对应的。数组项通常为数值  
+                        data: [${imgData}], 
+                         barWidth : 30, 
+                        //系列中的数据标注内容  
+                        markPoint: {  
+                            data: [  
+                                {type: 'max', name: '最大值'},  
+                                {type: 'min', name: '最小值'}  
+                            ]  
+                        },  
+                        //系列中的数据标线内容  
+                        markLine: {  
+                            data: [  
+                                {type: 'average', name: '平均值'}  
+                            ]  
+                        }  
+                    } 
+
+
+
+
+
+
+
+SELECT to_char(a.CREATE_DATE,'yyyy') as "year", to_char(a.CREATE_DATE,'mm') as "month", count(1) as "companyNum" ,b.area_id
+FROM T_BZ_AREA a ,T_BZ_AREA_DETAIL b
+WHERE (select id from T_BZ_AREA where  OFFICE_ID=(Select distinct AERA_OFFICE_ID from T_BA_REGISTERED where AERA_OFFICE_ID='5cab3305f2be4f099d0b8a698ad7e069' )) 
+group by to_char(a.CREATE_DATE,'yyyy'), to_char(a.CREATE_DATE,'mm'),b.area_id
+ORDER BY "month";
+
+select id 
+from T_BZ_AREA where  OFFICE_ID=(Select distinct AERA_OFFICE_ID from T_BA_REGISTERED where AERA_OFFICE_ID='5cab3305f2be4f099d0b8a698ad7e069'); 

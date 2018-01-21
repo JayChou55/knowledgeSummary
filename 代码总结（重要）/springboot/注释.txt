@@ -1,3 +1,7 @@
+﻿springboot启动类会自动扫描他所在的包的注解
+
+
+
 @Component 
 @ConfigurationProperties(prefix = "sms")
 	@ConfigurationProperties的大致作用就是通过它可以把properties或者yml配置直接转成对象

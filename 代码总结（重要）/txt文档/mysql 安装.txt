@@ -1,0 +1,62 @@
+rpm -qa | grep  mysql
+
+
+
+1、使用下面的命令检查是否安装有 MySQL Server:
+
+	# rpm -qa | grep mysql
+
+	mysql-libs-5.1.73-3.el6_5.x86_64
+
+如果是 CentOS7 以上，请使用以下命令查看：
+
+	# rpm -qa | grep mariadb
+
+	mariadb-libs-5.5.41-2.el7_0.x86_64
+
+（因为没有 MySQL 服务，因此没必要卸载。mysql-libs 是 MySQL 的必要包）（如果有的话可通过下面的命令来卸载掉，rpm -e mysql //普通删除模式）
+
+2、改防火墙设置，打开 3306 端口：
+
+	# vi /etc/sysconfig/iptables
+
+增加如下行：
+
+	## MySQL
+
+	-A INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+
+3、新增 mysql 用户组：
+
+	# groupadd mysql
+
+4、新增 mysql 用户，并添加到 mysql 用户组：
+
+	# useradd -r -g mysql mysql
+
+5、新建 MySQL 执行文件目录(后面会把编译好的 mysql 程序安装到这个目录)：
+
+	# mkdir -p /home/shop/mysql
+
+	（-p 参数的作用是：如果最终目录的父目录不存在也会一并创建）
+	
+6、新建 MySQL 数据库数据文件目录：
+
+	#mkdir -p /home/mysql/data
+
+	#mkdir -p /home/mysql/logs
+
+	#mkdir -p /home/mysql/temp
+
+（注意：上面的 logs 及 temp 目录是为了以后将 MySQL 的数据文件与执行程序文件分离，如果你打算设置到不同的路径，注意修改对应的执行命令和数据库初始化脚本。正式生产环境，建议数据目录和日志目录都使用单独的分区来挂载，不同分区属于不同的磁盘或磁盘组。）
+
+7、增加 PATH 环境变量搜索路径：
+
+	# vi /etc/profile
+
+	##在 profile 文件末尾增加两行
+
+	# mysql env param
+
+	PATH=/usr/local/mysql/bin:/usr/local/mysql/lib:$PATH
+

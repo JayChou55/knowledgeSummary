@@ -1,0 +1,7 @@
+1.解压
+	tar -zxf Mycat。。。
+2.配置
+	cd mycat 文件夹
+	Conf目录下
+3.启动	
+	bin/ ./mycat

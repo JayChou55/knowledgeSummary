@@ -1,0 +1,325 @@
+redis 序列化
+	前几天被问到这样一个问题，redis怎么存对象，平时也没怎么注意，只知道redis存字符之类的，不过就是根据键存取值，不过对象的话还是不同的
+
+首先来了解一下为什么要实现序列化
+
+为什么要实现序列化接口
+
+   当一个类实现了Serializable接口(该接口仅为标记接口,不包含任何方法定义),表示该类可以序列化.序列化的目的是将一个实现了Serializable接口的对象转换成一个字节序列,可以。 把该字节序列保存起来(例如:保存在一个文件里),以后可以随时将该字节序列恢复为原来的对象。甚至可以将该字节序列放到其他计算机上或者通过网络传输到其他计算机上恢复，只要该计 算机平台存在相应的类就可以正常恢复为原来的对象。 实现：要序列化一个对象，先要创建某些OutputStream对象，然后将其封装在一个ObjectOutputStream对象内，再调用writeObject()方法即可序列化一个对象；反序列化也类似。
+注意：使用对象流写入到文件是不仅要保证该对象是序列化的，而且该对象的成员对象也必须是序列化的
+
+关于Serializable接口的类中的serialVersionUID:
+serialVersionUID是long类型的。在Eclipse中有两种生成方式：
+默认的是1L：
+private static final long serialVersionUID = 1L;
+另外一个则是根据类名、接口名、成员方法以及属性等生成一个64位的哈希字段：
+private static final long serialVersionUID = 3969438177161438988L;
+serialVersionUID主要是为了解决对象反序列化的兼容性问题。
+如果没有提供serialVersionUID，对象序列化后存到硬盘上之后，再增加或减少类的filed。这样，当反序列化时，就会出现Exception，造成不兼容问题。
+但当serialVersionUID相同时，它就会将不一样的field以type的缺省值反序列化。这样就可以避开不兼容问题了。
+
+以上方式只能恢复成Java对象，如果想要恢复成其他对象(如C++对象)，那就要将Java对象转换为XML格式，这样可以使其被各种平台和各种语言使用。可以使用随JDK一起发布的javax.xam.*类库，或者使用开源XOM类库(可以从www.xom.nu下载并获得文档)。
+
+ 
+
+接下来看看redis是怎么存对象的
+
+ 
+
+复制代码
+package Object1;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import bean.Person;
+import redis.clients.jedis.Jedis;
+
+public class SerializeUtil {
+    public static void main(String [] args){
+        Jedis jedis = new Jedis("172.16.135.2");
+        String keys = "name";
+        // 删数据
+        //jedis.del(keys);
+        // 存数据
+        jedis.set(keys, "zy");
+        // 取数据
+        String value = jedis.get(keys);
+        System.out.println(value);
+        
+        //存对象
+        Person p=new Person();  //peson类记得实现序列化接口 Serializable
+        p.setAge(20);
+        p.setName("姚波");
+        p.setId(1);
+        jedis.set("person".getBytes(), serialize(p));
+        byte[] byt=jedis.get("person".getBytes());
+        Object obj=unserizlize(byt);
+        if(obj instanceof Person){
+            System.out.println(obj);
+        }
+    }
+    
+    //序列化 
+    public static byte [] serialize(Object obj){
+        ObjectOutputStream obi=null;
+        ByteArrayOutputStream bai=null;
+        try {
+            bai=new ByteArrayOutputStream();
+            obi=new ObjectOutputStream(bai);
+            obi.writeObject(obj);
+            byte[] byt=bai.toByteArray();
+            return byt;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    //反序列化
+    public static Object unserizlize(byte[] byt){
+        ObjectInputStream oii=null;
+        ByteArrayInputStream bis=null;
+        bis=new ByteArrayInputStream(byt);
+        try {
+            oii=new ObjectInputStream(bis);
+            Object obj=oii.readObject();
+            return obj;
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+        }
+    
+        
+        return null;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+zookeeper原理
+	三个角色：
+	领导者（leader），
+	学习者：追随者（follower）,观察者（oberserver）
+	客户端（Client）
+	
+
+ZooKeeper的工作原理
+Zookeeper的核心是原子广播，这个机制保证了各个Server之间的同步。实现这个机制的协议叫做Zab协议。Zab协议有两种模式，它们分别是恢复模式（选主）和广播模式（同步）。当服务启动或者在领导者崩溃后，Zab就进入了恢复模式，当领导者被选举出来，且大多数Server完成了和leader的状态同步以后，恢复模式就结束了。状态同步保证了leader和Server具有相同的系统状态。
+
+为了保证事务的顺序一致性，zookeeper采用了递增的事务id号（zxid）来标识事务。所有的提议（proposal）都在被提出的时候加上了zxid。实现中zxid是一个64位的数字，它高32位是epoch用来标识leader关系是否改变，每次一个leader被选出来，它都会有一个新的epoch，标识当前属于那个leader的统治时期。低32位用于递增计数。
+
+每个Server在工作过程中有三种状态：
+
+LOOKING：当前Server不知道leader是谁，正在搜寻
+
+LEADING：当前Server即为选举出来的leader
+
+FOLLOWING：leader已经选举出来，当前Server与之同步
+
+选主流程
+
+当leader崩溃或者leader失去大多数的follower，这时候zk进入恢复模式，恢复模式需要重新选举出一个新的leader，让所有的Server都恢复到一个正确的状态。Zk的选举算法有两种：一种是基于basic paxos实现的，另外一种是基于fast paxos算法实现的。系统默认的选举算法为fast paxos。先介绍basic paxos流程：
+
+1 .选举线程由当前Server发起选举的线程担任，其主要功能是对投票结果进行统计，并选出推荐的Server；
+
+2 .选举线程首先向所有Server发起一次询问(包括自己)；
+
+3 .选举线程收到回复后，验证是否是自己发起的询问(验证zxid是否一致)，然后获取对方的id(myid)，并存储到当前询问对象列表中，最后获取对方提议的leader相关信息(id,zxid)，并将这些信息存储到当次选举的投票记录表中；
+
+4.  收到所有Server回复以后，就计算出zxid最大的那个Server，并将这个Server相关信息设置成下一次要投票的Server；
+
+5.  线程将当前zxid最大的Server设置为当前Server要推荐的Leader，如果此时获胜的Server获得n/2 + 1的Server票数， 设置当前推荐的leader为获胜的Server，将根据获胜的Server相关信息设置自己的状态，否则，继续这个过程，直到leader被选举出来。
+
+通过流程分析我们可以得出：要使Leader获得多数Server的支持，则Server总数必须是奇数2n+1，且存活的Server的数目不得少于n+1.
+
+
+
+
+
+分布式锁
+	数据库读写锁
+		悲观锁：
+
+	　　顾名思义，很悲观，就是每次拿数据的时候都认为别的线程会修改数据，所以在每次拿的时候都会给数据上锁。上锁之后，当别的线程想要拿数据时，就会阻塞，直到给数据上锁的线程将事务提交或者回滚。传统的关系型数据库里就用到了很多这种锁机制，比如行锁，表锁，共享锁，排他锁等，都是在做操作之前先上锁。 
+	　　 
+	行锁：
+
+	　　下面演示行锁，打开两个mysql命令行界面，两个线程分别执行如下操作：（左边先执行） 
+	　　 
+	
+	　　 
+	　　左边的线程，在事务中通过select for update语句给sid = 1的数据行上了锁。右边的线程此时可以使用select语句读取数据，但是如果也使用select for update语句，就会阻塞，使用update，add，delete也会阻塞。 
+	　　当左边的线程将事务提交（或者回滚），右边的线程就会获取锁，线程不再阻塞： 
+	　　 
+	
+	　　 
+	　　此时，右边的线程获取锁，左边的线程如果执行类似操作，也会被阻塞： 
+	　　 
+	
+	　　 
+	表锁： 
+	　　 
+	　　上述例子中，如果使用如下语句就是使用的表锁：
+
+	select * from student for update;
+	1
+	页锁： 
+	　　 
+	　　行锁锁指定行，表锁锁整张表，页锁是折中实现，即一次锁定相邻的一组记录。 
+	　　 
+	共享锁： 
+	　　 
+	　　共享锁又称为读锁，一个线程给数据加上共享锁后，其他线程只能读数据，不能修改。 
+	　　 
+	排他锁： 
+	　　 
+	　　排他锁又称为写锁，和共享锁的区别在于，其他线程既不能读也不能修改。 
+	　　 
+	乐观锁： 
+	　　 
+	　　乐观锁其实不会上锁。顾名思义，很乐观，它默认别的线程不会修改数据，所以不会上锁。只是在更新前去判断别的线程在此期间有没有修改数据，如果修改了，会交给业务层去处理。 
+	　　常用的实现方式是使用版本戳，例如在一张表中添加一个整型字段version，每更新version++，比如某个时刻version=1，线程A读取了此version=1，线程B也读取了此version=1，当线程A更新数据之前，判断version仍然为1，更新成功，version++变为2，但是当线程B再提交更新时，发现version变为2了，与之前读的version=1不一致，就知道有别的线程更新了数据，这个时候就会进行业务逻辑的处理。 
+	　　 
+	通常情况下，写操作较少时，使用乐观锁，写操作较多时，使用悲观锁。
+
+
+
+
+线程池
+
+
+
+
+线程队列
+	线程池：我们可以把并发执行的任务传递给一个线程池，来替代为每个并发执行的任务都启动一个新的线程。只要池里有空闲的线程，任务就会分配给一个线程执行。在线程池的内部，任务被插入一个阻塞队列（Blocking Queue ），线程池里的线程会去取这个队列里的任务。当一个新任务插入队列时，一个空闲线程就会成功的从队列中取出任务并且执行它。
+	线程池经常应用在多线程服务器上。每个通过网络到达服务器的连接都被包装成一个任务并且传递给线程池。线程池的线程会并发的处理连接上的请求。以后会再深入有关 Java 实现多线程服务器的细节。
+	线程队列：是指线程处于拥塞的时候形成的调度队列
+	排队有三种通用策略：
+	直接提交。工作队列的默认选项是 SynchronousQueue，它将任务直接提交给线程而不保持它们。在此，如果不存在可用于立即运行任务的线程，则试图把任务加入队列将失败，因此会构造一个新的线程。此策略可以避免在处理可能具有内部依赖性的请求集时出现锁。直接提交通常要求无界 maximumPoolSizes 以避免拒绝新提交的任务。当命令以超过队列所能处理的平均数连续到达时，此策略允许无界线程具有增长的可能性。
+	无界队列。使用无界队列（例如，不具有预定义容量的 LinkedBlockingQueue）将导致在所有corePoolSize 线程都忙时新任务在队列中等待。这样，创建的线程就不会超过 corePoolSize。（因此，maximumPoolSize的值也就无效了。）当每个任务完全独立于其他任务，即任务执行互不影响时，适合于使用无界队列；例如，在 Web页服务器中。这种排队可用于处理瞬态突发请求，当命令以超过队列所能处理的平均数连续到达时，此策略允许无界线程具有增长的可能性。
+	有界队列。当使用有限的 maximumPoolSizes时，有界队列（如 ArrayBlockingQueue）有助于防止资源耗尽，但是可能较难调整和控制。队列大小和最大池大小可能需要相互折衷：使用大型队列和小型池可以最大限度地降低 CPU 使用率、操作系统资源和上下文切换开销，但是可能导致人工降低吞吐量。如果任务频繁阻塞（例如，如果它们是 I/O边界），则系统可能为超过您许可的更多线程安排时间。使用小型队列通常要求较大的池大小，CPU使用率较高，但是可能遇到不可接受的调度开销，这样也会降低吞吐量。
+
+
+solr常用对象
+mysql存储引擎
+redis数据类型
+
+ HASH set LIST SORT SET string
+
+
+嵌套事务
+	PROPAGATION_REQUIRED -- 支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。 
+	PROPAGATION_SUPPORTS -- 支持当前事务，如果当前没有事务，就以非事务方式执行。 
+	PROPAGATION_MANDATORY -- 支持当前事务，如果当前没有事务，就抛出异常。 
+	PROPAGATION_REQUIRES_NEW -- 新建事务，如果当前存在事务，把当前事务挂起。 
+	PROPAGATION_NOT_SUPPORTED -- 以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。 
+	PROPAGATION_NEVER -- 以非事务方式执行，如果当前存在事务，则抛出异常。 
+	PROPAGATION_NESTED -- 如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。 
+	前六个策略类似于EJB CMT，第七个（PROPAGATION_NESTED）是Spring所提供的一个特殊变量。 
+	它要求事务管理器或者使用JDBC 3.0 Savepoint API提供嵌套事务行为（如Spring的DataSourceTransactionManager）
+	
+	public class DemoServiceA {
+    
+    public void demoMethodA() {
+        
+        demoServiceB.demoMethodB();//Insert对象B 操作
+
+    }
+    
+}
+
+public class DemoServiceA {
+    
+    /** 
+     * 新建事务
+     * 事务属性配置为 PROPAGATION_REQUIRED 
+     */  
+    @Transactional(propagation=Propagation.REQUIRED)
+    public void demoMethodA() {
+        //操作...
+        
+        /** 
+         * 1.事务属性配置为 PROPAGATION_REQUIRES_NEW ；
+         * A. DemoServiceA 事务commit与rollback，与 DemoServiceB无任何关系，DemoServiceB 不属于事务 DemoServiceA的子事务。
+         *    PROPAGATION_REQUIRES_NEW 启动一个新的, 不依赖于环境的 "内部" 事务. 这个事务将被完全 commited 
+         *    或 rolled back 而不依赖于外部事务, 它拥有自己的隔离范围, 自己的锁, 当内部事务开始执行时, 
+         *    外部事务将被挂起, 内务事务结束时, 外部事务将继续执行. 
+         * B. 可以起到分支执行的效果。service方法虽然嵌套但是事务之间状态相互无影响
+         *  
+         *  
+         *     
+         * 2.事务属性配置为 PROPAGATION_NESTED；
+         * PROPAGATION_NESTED 开始一个 "嵌套的" 事务,  它是已经存在事务的一个真正的子事务. 
+         * 潜套事务开始执行时,  它将取得一个 savepoint. 如果这个嵌套事务失败, 
+         * 我们将回滚到此 savepoint. 潜套事务是外部事务的一部分, 只有外部事务结束后它才会被提交. 
+         * 
+         */   
+        demoServiceB.demoMethodB();//Insert对象B 操作
+        //操作...
+        
+    }
+}
+
+
+	1： REQUIRED
+
+	加入当前正要执行的事务不在另外一个事务里，那么就起一个新的事务
+
+	比如说，DemoServiceB.demoMethodB的事务级别定义为REQUIRED, 那么由于执行DemoServiceA.demoMethodA的时候，
+
+	DemoServiceA.demoMethodA已经起了事务，这时调用DemoServiceB.demoMethodB，DemoServiceB.demoMethodB看到自己已经运行在DemoServiceA.demoMethodA
+
+	的事务内部，就不再起新的事务。而假如DemoServiceA.demoMethodA运行的时候发现自己没有在事务中，他就会为自己分配一个事务。
+
+	这样，在DemoServiceA.demoMethodA或者在DemoServiceB.demoMethodB内的任何地方出现异常，事务都会被回滚。即使DemoServiceB.demoMethodB的事务已经被
+
+	提交，但是DemoServiceA.demoMethodA在接下来fail要回滚，DemoServiceB.demoMethodB也要回滚
+
+	2： SUPPORTS
+
+	如果当前在事务中，即以事务的形式运行，如果当前不再一个事务中，那么就以非事务的形式运行
+
+	3： MANDATORY
+
+	必须在一个事务中运行。也就是说，他只能被一个父事务调用。否则，他就要抛出异常
+
+	4： REQUIRES_NEW
+
+	这个就比较绕口了。 比如我们设计DemoServiceA.demoMethodA的事务级别为REQUIRED，DemoServiceB.demoMethodB的事务级别为REQUIRES_NEW，
+
+	那么当执行到DemoServiceB.demoMethodB的时候，DemoServiceA.demoMethodA所在的事务就会挂起，DemoServiceB.demoMethodB会起一个新的事务，等待DemoServiceB.demoMethodB的事务完成以后，
+
+	他才继续执行。他与REQUIRED 的事务区别在于事务的回滚程度了。因为DemoServiceB.demoMethodB是新起一个事务，那么就是存在
+
+	两个不同的事务。如果DemoServiceB.demoMethodB已经提交，那么DemoServiceA.demoMethodA失败回滚，DemoServiceB.demoMethodB是不会回滚的。如果DemoServiceB.demoMethodB失败回滚，
+
+	如果他抛出的异常被DemoServiceA.demoMethodA捕获，DemoServiceA.demoMethodA事务仍然可能提交。
+
+	5： NOT_SUPPORTED
+
+	当前不支持事务。比如DemoServiceA.demoMethodA的事务级别是REQUIRED ，而DemoServiceB.demoMethodB的事务级别是NOT_SUPPORTED ，
+
+	那么当执行到DemoServiceB.demoMethodB时，DemoServiceA.demoMethodA的事务挂起，而他以非事务的状态运行完，再继续DemoServiceA.demoMethodA的事务。
+
+	6： NEVER
+
+	不能在事务中运行。假设DemoServiceA.demoMethodA的事务级别是REQUIRED， 而DemoServiceB.demoMethodB的事务级别是NEVER ，
+
+	那么DemoServiceB.demoMethodB就要抛出异常了。
+
+	7： NESTED
+
+	理解Nested的关键是savepoint。他与REQUIRES_NEW的区别是，REQUIRES_NEW另起一个事务，将会与他的父事务相互独立，
+
+	而Nested的事务和他的父事务是相依的，他的提交是要等和他的父事务一块提交的。也就是说，如果父事务最后回滚，他也要回滚的。
