@@ -16,7 +16,10 @@ UUID=788f320b-105d-44fd-aef7-afa343eb095f /                       xfs     defaul
 UUID=e90f4b08-b368-4d00-8b7a-effe30c2c5c3 /boot                   xfs     defaults        0 0
 UUID=1f30f55a-a46e-48a4-873d-3464053acfe4 swap                    swap    defaults        0 0
 UUID=ff3d9126-c8e4-4eee-abd7-fe0126ca5443 /data                   ext3    defaults        0 0    =============这是我加的 /data 文件夹
-
+查看方式
+1. sudo blkid
+2. ls -l /dev/disk/by-uuid 
+3. tune2fs -l /dev/sdb
 
 
 
