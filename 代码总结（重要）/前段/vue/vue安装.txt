@@ -1,0 +1,12 @@
+npm install -g vue-cli
+
+vue list 查看功能
+
+vue init webpack sell 在当前目录生成一个sell名称的脚手架
+
+进入sell目录
+npm install
+
+npm run dev
+
+3-3

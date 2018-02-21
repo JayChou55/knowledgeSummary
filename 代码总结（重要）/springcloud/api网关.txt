@@ -1,0 +1,42 @@
+整合feign使用
+
+
+
+
+
+
+
+zuul下
+配置文件
+spring.application.name: msa-weather-eureka-client-zuul
+
+eureka.client.serviceUrl.defaultZone: http://localhost:8761/eureka/
+
+zuul.routes.city.path: /city/**
+zuul.routes.city.serviceId: msa-weather-city-eureka
+
+zuul.routes.data.path: /data/**
+zuul.routes.data.serviceId: msa-weather-data-eureka 
+
+
+
+
+
+feign-gateway项目下文件（通过feignClient去找zuul，然后它转发）
+
+@FeignClient("msa-weather-eureka-client-zuul")
+public interface DataClient {
+	/**
+	 * 获取城市列表
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/city/cities")
+	List<City> listCity() throws Exception;
+	
+	/**
+	 * 根据城市ID查询天气数据
+	 */
+	@GetMapping("/data/weather/cityId/{cityId}")
+	WeatherResponse getDataByCityId(@PathVariable("cityId") String cityId);
+}
