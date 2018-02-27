@@ -1,0 +1,9 @@
+悲观锁
+	明确指定主键，并且有结果集，行锁
+	select*from user where id ='1' for update
+	明确指定主键，无结果集，不上锁
+	select*from user where id ='-100' for update
+	无主键，表锁
+	select*from user where name ='xx' for update
+	主键不明确，表锁
+	select*from user where id !='66' for update
