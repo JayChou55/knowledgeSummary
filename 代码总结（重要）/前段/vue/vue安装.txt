@@ -4,9 +4,17 @@ vue list 查看功能
 
 vue init webpack sell 在当前目录生成一个sell名称的脚手架
 
-进入sell目录
+安装项目依赖
 npm install
-
+生成上线目录（部署）
 npm run dev
+启动测试服务
+npm run dev
+查看安装版本
+vue -V (大v)
 
-3-3
+
+安装前段路由
+npm install vue-router --save
+安装 状态管理
+npm install vuex --save
