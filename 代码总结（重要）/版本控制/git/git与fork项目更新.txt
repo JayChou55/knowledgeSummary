@@ -1,0 +1,55 @@
+1.解决方式1
+
+首先要先确定一下是否建立了主repo的远程源： git remote -v
+如果里面只能看到你自己的两个源(fetch 和 push)，那就需要添加主repo的源： git remote add upstream URL
+git remote -v
+这里的upstream是我们建立的远程branch的一个本地别名。 注意: 一般有https或者ssh的方式，如果是ssh的方式，则需要添加ssh的URL，不能添加https的方式，否则不能在ssh下访问该URL，另外，如果想删除remote的upstream标签，则可以运行： git remote rm upstream
+然后你就能看到upstream了。
+
+如果想与主repo合并： git fetch upstream
+git merge upstream/master
+
+2.解决方式2
+
+Fork 就是远程端上一份别人仓库的拷贝。
+
+流程：fork 源仓库 ---① fork-->
+fork 仓库副本 ---② clone-->
+local 仓库
+当你在远程端（如 Github）上 fork 了别人的一个仓库时，你的远程仓库将新建一份 fork 来的“仓库副本”。如果你想在本地修改这份副本仓库，你需要先 clone 它到本地：
+$ git clone git@github.com:YOUR_USERNAME/YOUR_FORK# 或$ git clone https://github.com/YOUR_USERNAME/YOUR_FORK
+
+现在你已经有了一份 fork 的本地副本，同时你可以开始在本地修改代码了。
+同步更新
+流程：fork 源仓库 ---① fetch & merge-->
+local 仓库 ---② push-->
+fork 仓库副本
+到目前为止，你本地仓库的远程信息可以用$ git remote -v
+查看到：
+https://github.com/YOUR_USERNAME/YOUR_FORK.git (fetch)https://github.com/YOUR_USERNAME/YOUR_FORK.git (push)
+
+为了获得 fork 源仓库的更新，现在要添加 fork 源仓库的地址，例如：
+$ git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPO.git
+
+这里的upstream
+是可以修改名称的，代表 fork 源仓库的别名。
+用$ git remote -v
+查看本地仓库关联的远程地址到：
+origin https://github.com/YOUR_USERNAME/YOUR_FORK.git (fetch)origin https://github.com/YOUR_USERNAME/YOUR_FORK.git (push)upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPO.git(fetch)upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPO.git (push)
+
+以上设置好了，当你要更新 fork 源仓库的时候，首先 fetch 一份源仓库变动到本地，这回生成一个分支upstream/master
+：
+$ git fetch upstream
+
+可以用查看分支命令查看所有分支：
+$ git branch
+
+然后，切换到本地 master 分支：
+$ git checkout master
+
+合并upstream/master
+分支的变化到本地 master 分支：
+$ git merge upstream/master
+
+到这里，仅把 fork 源仓库更新到了本地仓库，如果想要更新远程端的 fork 仓库副本 ，必须向远程端 push 一次：
+$ git push origin master

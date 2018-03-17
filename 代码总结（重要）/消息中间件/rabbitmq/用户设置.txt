@@ -1,0 +1,25 @@
+创建用户并设置角色：
+可以创建管理员用户，负责整个MQ的运维，例如：
+[plain] view plain copy
+$sudo rabbitmqctl add_user  user_admin  passwd_admin  
+赋予其administrator角色：
+[plain] view plain copy
+$sudo rabbitmqctl set_user_tags user_admin administrator  
+
+可以创建RabbitMQ监控用户，负责整个MQ的监控，例如：
+[plain] view plain copy
+$sudo rabbitmqctl add_user  user_monitoring  passwd_monitor  
+赋予其monitoring角色：
+[plain] view plain copy
+$sudo rabbitmqctl set_user_tags user_monitoring monitoring  
+
+可以创建某个项目的专用用户，只能访问项目自己的virtual hosts
+[plain] view plain copy
+$sudo rabbitmqctl  add_user  user_proj  passwd_proj  
+赋予其monitoring角色：
+[plain] view plain copy
+$sudo rabbitmqctl set_user_tags user_proj management  
+
+创建和赋角色完成后查看并确认：
+[plain] view plain copy
+$sudo rabbitmqctl list_users  

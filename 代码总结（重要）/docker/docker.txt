@@ -1,4 +1,9 @@
-yum install docker
+安装
+ 方法一
+	yum install docker
+ 方法二（3.16）
+	wget -q0- https://get.docker.com |sh
+
 
 docker registry
 	registry 是docker镜像中央存储仓库
@@ -23,7 +28,8 @@ docker search centos
 获取镜像
 docker pull
 查看镜像 
-dokcer images
+docker images
+docker ps
 删除镜像
 docker rmi
 
@@ -134,3 +140,27 @@ docker run -d -p 3306:3306 -v /var/lib/docker/vfs/dir/mydata:/var/lib/mysql csph
 
 docker exec -it d03 /bin/bash  
 	-it后是 container id  通过这种方式进入容器
+	
+	
+	
+	
+	
+=======================nginx示例=================================
+安装nginx
+	docker run -p 8080:80 -d daocloud.io/nginx
+新建一个html	
+	cat index.html	
+	<html>
+	<h1>Docker is fun!</h1>
+	</html>
+复制
+	docker cp index.html 容器ID://usr/share/nginx/html
+访问查看是否被更换
+
+如果需要保存
+	docker commit -m 'fun' 容器ID
+停止容器
+	docker stop 容器ID	
+	
+	
+	

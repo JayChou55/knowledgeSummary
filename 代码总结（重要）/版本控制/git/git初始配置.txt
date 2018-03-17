@@ -1,0 +1,18 @@
+1.如何生成ssh公钥
+
+你可以按如下命令来生成 sshkey: 
+
+ssh-keygen -t rsa -C "xxxxx@xxxxx.com"  
+
+# Generating public/private rsa key pair...
+# 三次回车即可生成 ssh key
+查看你的 public key，并把他添加到码云（Gitee.com） SSH key添加地址:https://gitee.com/profile/sshkeys)
+
+cat ~/.ssh/id_rsa.pub
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6eNtGpNGwstc....
+添加后，在终端（Terminal）中输入
+
+ssh -T git@gitee.com
+若返回
+
+Welcome to Gitee.com, yourname!

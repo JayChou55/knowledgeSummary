@@ -1,0 +1,22 @@
+=======================示例1===================
+
+创建一个Dockerfile
+	FROM alpine:latest
+	MAINTAINER xbf
+	CMD echo 'hello docker'
+
+build
+	当前Dockerfile目录下！
+	docker build -t hello_docker . (注意'.':表示当前面目录，-t 后面：等于给个标签)
+运行
+	docker run
+	
+=====================示例二=====================
+FROM ubuntu
+MAINTAINER xbf
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y nginx
+COPY index.html /var/www/html
+ENTRYPOINT ["/usr/sbin/nginx","-g","daemon off;"]
+EXPOSE 80
