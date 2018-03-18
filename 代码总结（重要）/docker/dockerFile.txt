@@ -1,9 +1,49 @@
+
+FROM 镜像名	（或者镜像：标签）
+MAINTAINER <name> 作者信息
+RUN <command> (shell模式)
+	/bin/sh-c command
+	RUN echo hello
+RUN ["executable","param1","param2"] (exec模式)
+
+EXPOS <port>用来指定映射的端口
+
+CMD ["executable","param1","param2"] (exec模式)运行时运行的区别run的构建中运行
+CMD command1 param1 param2（shell模式）
+CMD ["param1","param2"](作为ENTRYPOINT指令的默认参数)
+
+
+ENTRYPOINT ["executable","param1","param2"](exec模式)
+ENTRYPOINT command param1 param2(shell模式)
+
+可以使用docker run --entrypoint覆盖
+
+ADD <src>...<dest>
+ADD["<src>"..."<dest>"](适用于文件路径中有空格的情况)
+
+COPY  <src>...<dest>
+COPY["<src>"..."<dest>"](适用于文件路径中有空格的情况)
+
+ADD VS COPY
+add有解压 单纯复制用copy
+
+VOLUME["/data"]
+
+WORKDIR /path/to/workdir 指定工作路径
+
+ENV <key><value> 指定环境变量
+
+USER daemon
+	User nginx
+
+ONBUILD [INSTRUCTION] 触发器
+
 =======================示例1===================
 
-创建一个Dockerfile
-	FROM alpine:latest
-	MAINTAINER xbf
-	CMD echo 'hello docker'
+创建一个Dockerfile（Dockerfile每一行都产生一个新层，一个镜像文件可以由多个镜像文件叠加）
+	FROM alpine:latest   每一行都产生一个新层
+	MAINTAINER xbf       每一行都产生一个新层
+	CMD echo 'hello docker'  每一行都产生一个新层
 
 build
 	当前Dockerfile目录下！
@@ -11,12 +51,15 @@ build
 运行
 	docker run
 	
+
+	
+	
 =====================示例二=====================
 FROM ubuntu
 MAINTAINER xbf
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get install -y nginx
-COPY index.html /var/www/html
+COPY index.html /var/www/html  （ONBUILD COPY index.html /var/www/html）
 ENTRYPOINT ["/usr/sbin/nginx","-g","daemon off;"]
 EXPOSE 80

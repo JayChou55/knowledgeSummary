@@ -1,0 +1,24 @@
+docker run -v ~/container_data:/data -it ubuntu /bin/bash
+
+docker run -it -v ~/datavolume:/data ubuntu /bin/bash
+设置权限
+docker run -it -v ~/datavolume:/data:ro --name dvt1 ubuntu /bin/bash
+
+数据卷容器
+数据卷容器挂载
+	docker run --volumes-from [CONTAINER NAME]	（--volumes-from 从另外容器挂载）
+	
+	docker run -it --name dvt4 dormancypress/dvt
+	touch /datavolume1/dvt4_1
+	ls /datavolume1
+	exit
+	docker run -it --name dvt5 --volumes-from dvt4 ubuntu /bin/bash
+	
+	docker inspect --format="{{.Volumes}}" dvt5  只查看数据卷信息
+	
+	
+	例子：
+	docker create -v $PWD/data:/var/mydata --name data_container ubuntu
+	docker run -it --volunmes-from data_container ubuntu /bin/bash
+	
+	-javaagent:G:\Program Files\IntelliJ IDEA 2017.3.4\bin\JetbrainsCrack-2.7-release-str.jar

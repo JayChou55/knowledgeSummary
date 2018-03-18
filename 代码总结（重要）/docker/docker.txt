@@ -2,12 +2,12 @@
  方法一
 	yum install docker
  方法二（3.16）
-	wget -q0- https://get.docker.com |sh
+	wget -qO- https://get.docker.com |sh
 
 
 docker registry
 	registry 是docker镜像中央存储仓库
-docker info 查看信息
+docker info 查看信息docker驱动和存储位置
 docker version
 
 docker run 后面追加-d=true 或者-d 那么容器将会在后台模式运行
@@ -33,36 +33,103 @@ docker ps
 删除镜像
 docker rmi
 
-查看运行的docker
-docker ps -a 
 
 启动容器
 docker run --name -h hostname
+docker start -i 容器ID（开启进入容器）
 停止容器 
 docker stop CONTAINER ID
 查看容器 
 docker ps
+查看运行的docker容器
+docker ps 
+查看所有的docker容器
+docker ps -a 
+查看容器端口
+docker port 容器名称
+查看容器进程情况
+docker top web
 进入容器
 docker exec | docker attach
 删除容器
-docker rm CONTATINER ID
+docker rm 容器ID
+
+查看容器详细信息
+docker inspect 容器ID（或者名字）
+自定义容器名字
+docker run --name=name001 -i -t ubuntu /bin/bash
 
 随机映射
 docker run -d -P --name mynginx1 nginx
 docker ps -l
 指定映射
 docker run -d -p 91:80 mynginx2 nginx 
+
+设置容器端口映射
+-p :containerPort
+	docker run -p 80 -i -t ubuntu /bin/bash
 -p hostPort:containerPort 
--p ip:hostPort:contatinerPort
+	docker run -p 8080:80 -i -t ubuntu /bin/bash
 -p ip::containerPort
--p hostPort:containerPort
--p hostPort:containerPort
+	docker run -p 0.0.0.0:80 -i -t ubuntu /bin/bash
+-p ip:hostPort:contatinerPort
+	docker run -p 0.0.0.0:8080:80 -i -t ubuntu /bin/bash
 
+守护式容器
+	长期启动并没有交互的容器
+	docker run -i -t ubuntu /bin/bash
+	docker run -d
+	暂时推出来
+	ctrl+p或者ctrl+q
+	查看日志
+	docker logs 容器ID
+	重新进入容器
+	docker attach 容器ID（重新进入容器）
+	查看容器进程
+	docker top 容器ID
+	在运行中容器内启动新进程 格式：docker exec -d -i -t 容器名 
+	docker exec -i -t dc1 /bin/bash
+	
+停止守护容器
+	docker stop 容器名
+	docker kill 容器名
+镜像存储地址
+/var/lib/docker
 
-安装
-yum install docker or yum install -y docker-io
+修改镜像地址
+	
+提交镜像	
+	
+构建镜像
+	docker commit	通过容器构建
+		docker commit -a 'hj' -m 'test' commit_test mirror001  (-a 作者名 -m 镜像信息 commit_test容器名 mirror001好像是仓库名镜像名)
+		容器中有nginx服务 启动带着端口测试
+		docker run -d --name nginx_web1  -p 80 mirror001 nginx -g "daemon off;"
+		docker build 通过Dockerfile文件构建
+	使用Dockerfile构建
+	
+docker的c/s模式
+		unix:///var/run/docker.sock
+		tcp://host:port
+		fd://socketfd
+	nc -U /var/run/docker.sock
+	GET /info HTTP/1.1
 
+docker远程访问-修改服务端配置
+		-H tcp://host:port  如 docker -H tcp://10.211.55.5:2375 info
+		unix:///path/to/socket
+		fd://*or fd://socketfd
+	守护进程默认配置
+	-H unix:///var/run/docker.sock
+	
+docker客户端使用docker info默认访问的是本地Server。可以修改环境变量DOCKER_HOST改变默认连接。命令行直接输入：
 
+export DOCKER_HOST="tcp://127.0.0.1:2375"
+
+如果想恢复本地连接，将 DOCKER_HOST 置空即可：
+
+export DOCKER_HOST=""	
+	
 启动 Docker 服务
 
 安装完成后，使用下面的命令来启动 docker 服务，并将其设置为开机启动：
@@ -109,17 +176,17 @@ ip ro li
 
 docker run -it --name volume-test1	-h nginx -v /data nginx
 -i:终端保持打开状态
-t:启动一个tty
+t:启动一个tty （终端）
 -h：启动主机名
 -v:数据卷
 
-docker inspect -f {{.Volumes}} volume-test1
-	
-docker run -d -p 5000:5000 --name registry
+	docker inspect -f {{.Volumes}} volume-test1
+		
+	docker run -d -p 5000:5000 --name registry
 
 生成docker镜像
-docker build -t registry_url/namespace/csphere/centos:lastest
-docker build -t csphere/centos:7.1 . 或者./path（path地址）
+	docker build -t registry_url/namespace/csphere/centos:lastest
+	docker build -t csphere/centos:7.1 . 或者./path（path地址）
 
 启动
 	docker run -d 
@@ -145,7 +212,7 @@ docker exec -it d03 /bin/bash
 	
 	
 	
-=======================nginx示例=================================
+=======================nginx示例1=================================
 安装nginx
 	docker run -p 8080:80 -d daocloud.io/nginx
 新建一个html	
@@ -162,5 +229,29 @@ docker exec -it d03 /bin/bash
 停止容器
 	docker stop 容器ID	
 	
-	
-	
+======================Ubuntu进入演示=========================
+docker run -i -t ubuntu /bin/bash
+ps -ef 
+
+====================nginx示例2=============================
+	 docker run -p 80 --name web -i -t ubuntu /bin/bash
+	 进入容器后
+	 apt-get install -y nginx
+		如果有问题 更新
+		apt-get update
+	apt-get install -y  vim 安装vim 
+	根目录直接运行nginx
+	cd /
+	nginx
+	退出镜像
+	Ctrl+P+Q
+	查看nginx端口号
+	docker port web（web是这个镜像的name）
+	查看web镜像进程
+	docker top web
+	停止
+	docker stop web
+	启动（此时nginx进程会没）
+	docker start -i web
+	启动nginx（此时分配的端口或者docker的ip也变了）
+	docker exec web nginx
