@@ -4,6 +4,8 @@
  方法二（3.16）
 	wget -qO- https://get.docker.com |sh
 
+Centos7 配置文件地址
+	/usr/lib/systemd/system/docker.service
 
 docker registry
 	registry 是docker镜像中央存储仓库
@@ -35,7 +37,7 @@ docker rmi
 
 
 启动容器
-docker run --name -h hostname
+docker run --name -h hostname (指定名称 -d 容器会在后台模式运行)
 docker start -i 容器ID（开启进入容器）
 停止容器 
 docker stop CONTAINER ID
