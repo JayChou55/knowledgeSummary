@@ -4,10 +4,15 @@
  方法二（3.16）
 	wget -qO- https://get.docker.com |sh
 
+
 卸载
 yum erase docker docker-common docker-client docker-compose
 删除镜像/容器等：$ rm -rf /var/lib/docker
 
+
+
+Centos7 配置文件地址
+	/usr/lib/systemd/system/docker.service
 
 
 docker registry
@@ -40,7 +45,7 @@ docker rmi
 
 
 启动容器
-docker run --name -h hostname
+docker run --name -h hostname (指定名称 -d 容器会在后台模式运行)
 docker start -i 容器ID（开启进入容器）
 停止容器 
 docker stop CONTAINER ID
@@ -81,8 +86,16 @@ docker run -d -p 91:80 mynginx2 nginx
 	docker run -p 0.0.0.0:8080:80 -i -t ubuntu /bin/bash
 
 守护式容器
-	长期启动并没有交互的容器
+	长期启动并有交互的容器
 	docker run -i -t ubuntu /bin/bash
+	
+	docker create 00name myjava -it java /bin/bash 启动并有交互的容器
+	docker start myjava
+	docker exec -it 容器ID /bin bash
+	ls 
+	mkdir leader-us
+	ls
+	
 	docker run -d
 	暂时推出来
 	ctrl+p或者ctrl+q
