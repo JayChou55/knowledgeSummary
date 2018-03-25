@@ -4,6 +4,11 @@
  ·½·¨¶þ£¨3.16£©
 	wget -qO- https://get.docker.com |sh
 
+Ð¶ÔØ
+yum erase docker docker-common docker-client docker-compose
+É¾³ý¾µÏñ/ÈÝÆ÷µÈ£º$ rm -rf /var/lib/docker
+
+
 
 docker registry
 	registry ÊÇdocker¾µÏñÖÐÑë´æ´¢²Ö¿â

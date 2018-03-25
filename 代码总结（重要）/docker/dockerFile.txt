@@ -1,3 +1,6 @@
+github dokcer——library      https://github.com/docker-library/official-images 
+
+
 
 FROM 镜像名	（或者镜像：标签）
 MAINTAINER <name> 作者信息
@@ -16,10 +19,26 @@ CMD ["param1","param2"](作为ENTRYPOINT指令的默认参数)
 ENTRYPOINT ["executable","param1","param2"](exec模式)
 ENTRYPOINT command param1 param2(shell模式)
 
-可以使用docker run --entrypoint覆盖
+可以使用docker run 后面加指令的话 --cmd会被覆盖
+--entrypoint让容器以应用程序或者服务运行，不会被忽略，一定会执行。
+写一个shell脚本作为entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+
+
 
 ADD <src>...<dest>
 ADD["<src>"..."<dest>"](适用于文件路径中有空格的情况)
+ADD hello /
+ADD test.tar.gz / #添加根目录并解压
+
+WORKDIR /root
+ADD	hello test/ #/root/test/hello
+
+WORKDIR /root
+COPY hello test/
+
 
 COPY  <src>...<dest>
 COPY["<src>"..."<dest>"](适用于文件路径中有空格的情况)
@@ -32,6 +51,10 @@ VOLUME["/data"]
 WORKDIR /path/to/workdir 指定工作路径
 
 ENV <key><value> 指定环境变量
+ENV MYSQL_VERSION 5.6
+RUN  apt-get install -y mysql-server= "${MYSQL_VERSION}" \
+	 && rm -rf /var/lib/apt/lists/*	#引用常量${MYSQL_VERSION}=5.6
+
 
 USER daemon
 	User nginx
