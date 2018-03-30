@@ -1,0 +1,36 @@
+mkdir redis
+[root@izuf69kdj07ayomditleelz data]# cd redis/
+[root@izuf69kdj07ayomditleelz redis]# mkdir data
+[root@izuf69kdj07ayomditleelz redis]# docker run -p 6379:6379 -v $PWD/data:/data  -d redis redis-server --appendonly yes
+Unable to find image 'redis:latest' locally
+latest: Pulling from library/redis
+b0568b191983: Pull complete 
+6637dc5b29fe: Pull complete 
+7b4314315f15: Pull complete 
+67b22db27e51: Pull complete 
+350dbcc91819: Pull complete 
+eee5ee716895: Pull complete 
+Digest: sha256:26c93c5b06eaa323bb1089500f42b0dd158138772348b865e364127f1d554982
+Status: Downloaded newer image for redis:latest
+2f7a5f1f02f0488479a165f8750ec67648378976d7207c55944d6a765f6d3a6c
+[root@izuf69kdj07ayomditleelz redis]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+elasticsearch       latest              6c0bdf761f3b        7 days ago          570MB
+<none>              <none>              e0756f814a2c        9 days ago          244MB
+mirror001           latest              d7f26b906b4b        9 days ago          262MB
+xbf/hello-nginx     latest              294d178dc74a        9 days ago          209MB
+hello_docker        latest              30955fd00d17        11 days ago         4.15MB
+redis               latest              4760dc956b2d        12 days ago         107MB
+ubuntu              latest              f975c5035748        2 weeks ago         112MB
+ubuntu              14.04               a35e70164dfb        2 weeks ago         222MB
+centos              latest              2d194b392dd1        3 weeks ago         195MB
+daocloud.io/nginx   latest              e548f1a579cf        4 weeks ago         109MB
+registry            latest              d1fd7d86a825        2 months ago        33.3MB
+alpine              latest              3fd9065eaf02        2 months ago        4.15MB
+[root@izuf69kdj07ayomditleelz redis]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+2f7a5f1f02f0        redis               "docker-entrypoint.s…"   23 seconds ago      Up 20 seconds       0.0.0.0:6379->6379/tcp   modest_dijkstra
+[root@izuf69kdj07ayomditleelz redis]# docker exec -it redis redis-cli
+Error: No such container: redis
+[root@izuf69kdj07ayomditleelz redis]# docker exec -it 2f7a redis-cli
+

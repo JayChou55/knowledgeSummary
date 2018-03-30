@@ -1,0 +1,44 @@
+过滤器
+Spring Security Configurer
+
+Spring Security Config模块一共有3个builder，认证相关的AuthenticationManagerBuilder和web相关的WebSecurity、HttpSecurity。
+
+AuthenticationManagerBuilder
+
+AuthenticationManagerBuilder用来配置全局的认证相关的信息，其实就是AuthenticationProvider和UserDetailsService，前者是认证服务提供商，后者是用户详情查询服务。
+
+WebSecurity
+
+全局请求忽略规则配置（比如说静态文件，比如说注册页面）、全局HttpFirewall配置、是否debug配置、全局SecurityFilterChain配置、privilegeEvaluator、expressionHandler、securityInterceptor、
+
+HttpSecurity
+
+具体的权限控制规则配置。一个这个配置相当于xml配置中的一个标签。 
+各种具体的认证机制的相关配置，OpenIDLoginConfigurer、AnonymousConfigurer、FormLoginConfigurer、HttpBasicConfigurer 
+LogoutConfigurer 
+RequestMatcherConfigurer：spring mvc style、ant style、regex style 
+HeadersConfigurer： 
+CorsConfigurer、CsrfConfigurer 
+SessionManagementConfigurer： 
+PortMapperConfigurer： 
+JeeConfigurer： 
+X509Configurer： 
+RememberMeConfigurer： 
+ExpressionUrlAuthorizationConfigurer： 
+RequestCacheConfigurer： 
+ExceptionHandlingConfigurer： 
+SecurityContextConfigurer： 
+ServletApiConfigurer： 
+ChannelSecurityConfigurer： 
+此模块的authenticationProvider和userDetailsService； 
+SecurityFilterChain控制
+
+
+
+登录请求流程
+Usernamepassword AuthenticationFilter==> （未认证）
+AuthenticationManager ==>（管理Provider包含方法里面provider校验）
+AuthenticationProvider ==>（真正的校验位置）
+UserDetailsService ==>
+UserDetails ==>
+Authentication(已经认证)

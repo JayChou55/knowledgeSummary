@@ -1,0 +1,22 @@
+实现UserDetailService
+UserDetails loadUseByUsername(String username)
+
+security里面的User对象 实现了UserDetails接口 里面有username,password和权限集合
+
+处理用户信息获取逻辑	UserDetailService
+处理用户校验逻辑	UserDetails
+处理密码加密解密	PasswordEncoder
+
+
+
+
+MyUserDetailService implements UserDetailService {
+
+	@Override
+	public UserDetails loadUseByUsername(String username) throws UsernameNotFoundException{
+		logger.info("用户名"+ username);
+		
+		return new User(username,"123456",authorities);
+	}
+
+}
