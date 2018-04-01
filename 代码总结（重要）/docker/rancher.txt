@@ -1,0 +1,7 @@
+docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable
+
+然后复制网页中代码到agent中
+
+添加应用==添加项目
+
+添加容器==添加一个服务
