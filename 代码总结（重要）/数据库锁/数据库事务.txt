@@ -1,4 +1,4 @@
-ACID表示原子性（atomicity）、一致性（consistency）、隔离性（isolation）和持久性（durability）。一个很好的事务处理系统，必须具备这些标准特性：
+﻿ACID表示原子性（atomicity）、一致性（consistency）、隔离性（isolation）和持久性（durability）。一个很好的事务处理系统，必须具备这些标准特性：
 
 隔离级别：
 
@@ -51,3 +51,19 @@ Read uncommitted	√			√		 √
 Read committed		×			√		 √
 Repeatable read		×			×	 	 √
 Serializable		×			×		 ×
+
+
+
+
+users： id 主键1、T1：select * from users where id = 1;
+2、T2：insert into `users`(`id`, `name`) values (1, 'big cat');
+3、T1：insert into `users`(`id`, `name`) values (1, 'big cat');
+T1 ：主事务，检测表中是否有 id 为 1 的记录，没有则插入，这是我们期望的正常业务逻辑。
+T2 ：干扰事务，目的在于扰乱 T1 的正常的事务执行。
+在 RR 隔离级别下，1、2 是会正常执行的，3 则会报错主键冲突，对于 T1 的业务来说是执行失败的，这里 T1 就是发生了幻读，
+因为T1读取的数据状态并不能支持他的下一步的业务，见鬼了一样。在 Serializable 隔离级别下，1 执行时是会隐式的添加 gap 共享锁的，
+从而 2 会被阻塞，3 会正常执行，对于 T1 来说业务是正确的，成功的扼杀了扰乱业务的T2，对于T1来说他读取的状态是可以拿来支持业务的。
+所以 mysql 的幻读并非什么读取两次返回结果集不同，而是事务在插入事先检测不存在的记录时，惊奇的发现这些数据已经存在了，
+之前的检测读获取到的数据如同鬼影一般。这里要灵活的理解读取的意思，第一次select是读取，第二次的 insert 其实也属于隐式的读取，
+只不过是在 mysql 的机制中读取的，插入数据也是要先读取一下有没有主键冲突才能决定是否执行插入。不可重复读侧重表达 读-读，
+幻读则是说 读-写，用写来证实读的是鬼影。
