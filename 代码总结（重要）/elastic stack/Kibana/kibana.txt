@@ -1,0 +1,9 @@
+配置文件位于config文件夹
+kibana.yml关键配置说明
+	server.host/server.port 访问kibana用的地址和端口
+Discover 数据搜索查看
+Visualize 图表制作
+Dashboard 仪表盘制作
+Timelion 时序数据的高级可视化分析
+DevTools 开发者工具
+Manaement 配置

@@ -1,0 +1,81 @@
+环境介绍
+Centos 7.2 + Docker 17.09.0-ce + Elasticsearch 5.6.3 + elasticsearch-head 5
+
+拉取镜像
+docker pull docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+docker pull mobz/elasticsearch-head:5
+
+配置文件
+elsasticsearch
+es1.yml
+
+cluster.name: "dali"
+node.name: node1
+node.master: true
+node.data: true
+# head插件设置
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+# 关闭X-Pack
+xpack.security.enabled: false
+network.host: 0.0.0.0
+discovery.zen.minimum_master_nodes: 1
+
+es2.yml
+
+cluster.name: "dali"
+node.name: node2
+node.master: false
+node.data: true
+# head插件设置
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+# 关闭X-Pack
+xpack.security.enabled: false
+network.host: 0.0.0.0
+discovery.zen.minimum_master_nodes: 1
+discovery.zen.ping.unicast.hosts: es1
+
+head
+app.js
+
+/* 修改localhost为elasticsearch集群地址，本机部署可不改 */
+this.base_uri = this.config.base_uri || this.prefs.get("app-base_uri") || "http://localhost:9200";
+
+Gruntfile.js
+
+    connect: {
+            server: {
+                options: {
+                    /* 默认监控：127.0.0.1,修改为：0.0.0.0 */
+                    hostname: '0.0.0.0',
+                    port: 9100,
+                    base: '.',
+                    keepalive: true
+                }
+            }
+
+创建容器
+ # es1
+docker run -d --name es1 -p 9200:9200 -p 9300:9300 -v /root/es_docker/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /root/es_docker/esdata1:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:5.6.2
+ # es2
+docker run -d --name es2 --link es1:es1 -p 9201:9200 -p 9301:9300 -v /root/es_docker/es2.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /root/es_docker/esdata2:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:5.6.2
+ # head
+docker run -d --name head -p 9100:9100 --network esdocker_esnet -v /root/es_docker/head/Gruntfile.js:/usr/src/app/Gruntfile.js -v /root/es_docker/head/app.js:/usr/src/app/_site/app.js mobz/elasticsearch-head:5
+
+查看集群状态
+curl http://192.168.56.101:9200/_cat/health?v
+1
+2
+查看Head集群状态
+http://192.168.56.101:9100/
+
+管理容器
+# 停止
+docker stop head es1 es2
+# 启动
+docker start head es1 es2
+# 重启
+docker restart head es1 es2
+# 停止并删除所有容器
+docker rm -f $(docker ps -aq)

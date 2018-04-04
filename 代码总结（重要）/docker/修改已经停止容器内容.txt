@@ -1,0 +1,13 @@
+怎么修改无法启动的docker容器的配置？
+原因：
+由于错误的配置导致原来可以启动的docker容器不能启动了。相信很多人的做法是删除容器重建一个，这样也是可以的，但是你的配置和插件就得重新安装，非常麻烦。最小的代价当然是修改原来的配置让他能启动了。docker容器起不来了怎么改配置？
+
+解决方案：
+由于我开启的容器是elasticsearch-5.6.4，安装了ik插件，修改配置重启时，起不来了，瘫痪了。正确的解决姿势是将容器的配置cp出来（到宿主机），修改正确然后cp回去，启动就行了。
+
+我的容器：es-node-1，容器配置路径：/usr/share/elasticsearch/config
+
+docker cp es-node-1:/usr/share/elasticsearch/config/elasticsearch.yml . #cp出来，到宿主机当前目录下
+vi elasticsearch.yml #修改配置
+docker cp elasticsearch.yml es-node-1:/usr/share/elasticsearch/config/elasticsearch.yml #cp回去
+docker start es-node-1 #重启

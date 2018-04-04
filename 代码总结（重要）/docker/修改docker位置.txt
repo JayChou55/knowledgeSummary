@@ -1,0 +1,64 @@
+解决方案
+在默认情况下，Docker镜像和容器的默认存放位置为:/var/lib/docker
+
+一般根下分区我们不会给太大。镜像和容器越存越多一般我们有两种解决方法:
+
+1. 挂载大分区到/var/lib/docker
+
+一般选择建立逻辑分区lvm，方便后期扩展集体。
+
+建立新分区，并格式化
+
+[root@localhost lib]# lvcreate -L 300G lv_docker vg_home  
+[root@localhost lib]# mkfs.ext4 /dev/vg_home/lv__docker  
+挂载新分区到临时挂载点
+
+[root@localhost lib]# mkdir /mnt/docker  
+[root@localhost lib]# mount /dev/vg_home/lv_docker /mnt/docker/ 
+停掉docker服务后，复制/var/lib/docker下数据到临时挂载点
+
+[root@localhost lib]# service docker stop  
+[root@localhost lib]# cp -r /var/lib/docker/* /mtn/docker 
+修改/var/lib/docker为/var/lib/docker.bak，并创建/var/lib/docker
+
+[root@localhost lib]# mv /var/lib/docker{,.bak} 
+[root@localhost lib]# mkdir /var/lib/docker  
+挂载新分区到/var/lib/docker，并设置开机自动挂载
+
+[root@localhost lib]# mount /dev/vg_home/lv_docker /var/lib/docker 
+[root@localhost lib]# vim /etc/fstab
+
+---  
+ /dev/vg_home/lv_docker /var/lib/docker   ext4    defaults 0 0
+----   
+启动Docker服务，检查Docker服务是否可用， 数据是否完整
+
+[root@localhost lib]# /etc/init.d/docker start
+[root@localhost lib]# docker images  
+[root@localhost lib]# docker ps -a
+确认无误后卸载临时挂载点，删除/var/lib/docker.bak
+
+[root@localhost lib]# umount /mnt/docker  
+[root@localhost lib]# rm -rf /var/lib/docker.bak
+2. 修改镜像和容器的存放路径
+
+在Docker服务配置文件/etc/sysconfig/docker中修改镜像和容器存放路径的参数， 在配置文件中加入：
+
+other_args="--graph=/data/docker"。
+具体执行步骤如下：
+
+停止Docker服务
+[root@localhost lib]# service docker stop
+备份数据到新的存放路径
+[root@localhost lib]# cp -rf /var/lib/docker /data/
+修改备份/var/lib/docker路径
+[root@localhost lib]# mv /var/lib/docker{,.bak}
+启动Docker服务
+[root@localhost lib]# service docker start
+测试Docker服务
+[root@localhost lib]# docker info
+
+作者：garyond
+链接：https://www.jianshu.com/p/4e60cf1cf4b8
+來源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
