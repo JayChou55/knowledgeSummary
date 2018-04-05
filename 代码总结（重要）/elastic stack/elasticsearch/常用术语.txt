@@ -1,0 +1,17 @@
+Document 文档数据
+Index 索引 相当于数据库
+Type 索引中的数据类型 相当于table
+Field 字段，文档的属性
+QueryDsl 查询语言
+
+创建文档
+	POST /accounts/person/1
+	{
+		"name":"xx".
+		"lastname":"Doe",
+		"job_description":"Systems,xxxx"
+	}
+
+{
+ "_index":""
+	
