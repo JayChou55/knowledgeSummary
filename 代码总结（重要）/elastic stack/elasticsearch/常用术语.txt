@@ -1,17 +1,128 @@
-Document 文档数据
+﻿Document 文档数据
 Index 索引 相当于数据库
 Type 索引中的数据类型 相当于table
 Field 字段，文档的属性
 QueryDsl 查询语言
 
-创建文档
-	POST /accounts/person/1
-	{
-		"name":"xx".
-		"lastname":"Doe",
-		"job_description":"Systems,xxxx"
-	}
+正排索引
+	文档ID到文档内容、单词的关联关系
+	1 世界美好
+	2 学习开心
+	（id 1和2对应的语句）
+倒排索引
+	单词到文档ID的关联关系
+		美女 1,2 （美女在id 1和2出现）
+		帅哥 3	（帅哥在id 3中出现）
 
+查询"美女"相关文档
+	通过倒排获得"美女"对应的文档ID 1,3
+	通过正排索引获得1,3完整内容
+	返回信息
+单词字典一般B+ Tree
+
+POST _bulk
+action_type:{index:{"_index":"text_index","_type":"doc","_id":"3"}}				(没有创建，有就覆盖)
+			{"username":"jay","age":"40"}
+			{"update":{"_id":"2","test_index","_type":"doc","_id":"1"}}
+			{"doc":"age":"20"}}
+			create
+			{"delete":{"_index":"test_index","type":"doc","_id":"1"}}
+
+GET /_mget
 {
- "_index":""
+	"docs":[
+		{
+			"_index":"test_index",
+			"_type":"doc",
+			"_id":"1"
+		},
+		{
+			"_index":"test_index",
+			"_type":"doc",
+			"_id":"2"
+		}
+	]
+}
+
+创建文档
+写入
+	POST /account/person/1
+	{
+	  "name":"jay",
+	  "lastname":"chou",
+	  "descrption":"sdasdasd"
+
+	  
+	}
+完成
+	{
+	  "_index": "account",
+	  "_type": "person",
+	  "_id": "1",
+	  "_version": 1,
+	  "result": "created",
+	  "_shards": {
+		"total": 2,
+		"successful": 1,
+		"failed": 0
+	  },
+	  "created": true
+	}
+读取	
+	GET account/person/1
+完成	
+	{
+	  "_index": "account",
+	  "_type": "person",
+	  "_id": "1",
+	  "_version": 1,
+	  "found": true,
+	  "_source": {
+		"name": "jay",
+		"lastname": "chou",
+		"descrption": "sdasdasd"
+	  }
+	}
+更新
+	POST account/person/1/_update
+	{
+	  "doc":{
+		"descrption":"ddddd"
+	  }
+	}
+完成
+	{
+	  "_index": "account",
+	  "_type": "person",
+	  "_id": "1",
+	  "_version": 2,
+	  "result": "updated",
+	  "_shards": {
+		"total": 2,
+		"successful": 1,
+		"failed": 0
+	  }
+	}	
+删除	
+	DELETE account/person/1
+
+	DELETE /account
+	
+查询	
+	Query String 
+		GET /account/person/_serach?q=john
+	Query DSL
+		Get /account/person/_search
+		{
+			"query":{
+				"match":{
+					"name":"jay"
+				}
+			}
+		}
+		
+		
+		
+		
+	
 	
