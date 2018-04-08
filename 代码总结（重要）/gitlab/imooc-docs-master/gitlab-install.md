@@ -8,7 +8,7 @@ $ docker pull registry.cn-hangzhou.aliyuncs.com/imooc/gitlab-ce:latest
 ## 二、运行GitLab容器
 使用docker命令运行容器，注意修改hostname为自己喜欢的名字，-v部分挂载目录要修改为自己的目录。  
 端口映射这里使用的都是安全端口，如果大家的环境没有端口限制或冲突可以使用与容器同端口，如：-p 443:443 -p 80:80 -p 22:22
-#### 1. 生成启动文件 - start.sh
+#### 1. 生成启动文件 - start.sh 	v \${GITLAB_DIR}/data:/var/opt/gitlab 这个是仓库地址
 ```bash
 $ cat <<EOF > start.sh
 #!/bin/bash
