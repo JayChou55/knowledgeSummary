@@ -140,6 +140,51 @@ Filter过滤器上下文：
 			}	
 		}
 	}
+	{
+		"query":{
+			"filtered":{
+				"filter"：{
+					"bool":{
+						"should":[
+							{
+							"term":{
+								"price":20
+								}
+							},
+							{
+							"term":{
+									"productID":"SD1002136"
+								}
+							}						
+						],
+						"must_not":{
+							"term":{"price":30}
+						}
+						
+					}
+				}
+			}	
+		}
+	}
+	查询10月之前contents字段包含“ES”的文档
+	{
+		"query": {
+			"filtered":{
+				"query":{
+					"range":{
+						"date":{
+							"lte":"2016-10-01"
+						}
+					}
+				},
+				"filter":{
+					"match":{
+						"contents":"ES"
+					}
+				}
+			}   
+		}
+	}
 	复合查询
 		固定分数查询，只支持filer不支持match
 	查询分数为2的
