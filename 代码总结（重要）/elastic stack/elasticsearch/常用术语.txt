@@ -37,6 +37,20 @@ Filter过滤器上下文：
 
 2 过滤器上下文中，查询的结果可以被缓存。	
 查询	
+
+
+
+	http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
+
+	curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
+	{
+  	"query": { "match_all": {} },
+ 	 "from": 10,
+ 	 "size": 10
+	}
+
+
+
 	match:模糊匹配
 	{
 		"query":{
