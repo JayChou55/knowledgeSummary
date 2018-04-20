@@ -1,1 +1,13 @@
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.2.tar.gz
+
+
+connect: {
+            server: {
+                options: {
+                    /* 默认监控：127.0.0.1,修改为：0.0.0.0 */
+                    hostname: '0.0.0.0',
+                    port: 9100,
+                    base: '.',
+                    keepalive: true
+                }
+            }

@@ -98,7 +98,7 @@ $ cat ~/.ssh/id_rsa.pub
 
 #如果上一步没有这个文件 我们就创建一个，运行下面命令（邮箱改成自己的哦），一路回车就好了
 $ ssh-keygen -t rsa -C "youremail@example.com"
-$ cat ~/.ssh/id_rsa.pub
+$ cat ~/.ssh/id_rsa.pub    或者cd /root/.ssh/
 ```
 
 #### 6. 测试一下

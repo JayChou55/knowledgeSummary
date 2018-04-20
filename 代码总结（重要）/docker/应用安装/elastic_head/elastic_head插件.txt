@@ -70,6 +70,7 @@ curl http://192.168.56.101:9200/_cat/health?v
 查看Head集群状态
 http://192.168.56.101:9100/
 
+
 管理容器
 # 停止
 docker stop head es1 es2
