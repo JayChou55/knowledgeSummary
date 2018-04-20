@@ -1,4 +1,4 @@
-Document 文档数据
+﻿Document 文档数据
 Index 索引 相当于数据库
 Type 索引中的数据类型 相当于table
 Field 字段，文档的属性
@@ -14,4 +14,307 @@ QueryDsl 查询语言
 
 {
  "_index":""
+	
+Query与Filter
+查询在Query查询上下文和Filter过滤器上下文中，执行的操作是不一样的：
+
+Query查询上下文：
+
+在查询上下文中，查询会回答这个问题——“这个文档匹不匹配这个查询，它的相关度高么？”
+
+如何验证匹配很好理解，如何计算相关度呢？之前说过，ES中索引的数据都会存储一个_score分值，分值越高就代表越匹配。另外关于某个搜索的分值计算还是很复杂的，因此也需要一定的时间。
+
+查询上下文 是在 使用query进行查询时的执行环境，比如使用search的时候。
+
+Filter过滤器上下文：
+
+在过滤器上下文中，查询会回答这个问题——“这个文档匹不匹配？”
+
+答案很简单，是或者不是。它不会去计算任何分值，也不会关心返回的排序问题，因此效率会高一点。
+
+过滤上下文 是在使用filter参数时候的执行环境，比如在bool查询中使用Must_not或者filter。	
+1 查询上下文中，查询操作不仅仅会进行查询，还会计算分值，用于确定相关度；在过滤器上下文中，查询操作仅判断是否满足查询条件
+
+2 过滤器上下文中，查询的结果可以被缓存。	
+查询	
+
+
+
+	http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
+
+	curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
+	{
+  	"query": { "match_all": {} },
+ 	 "from": 10,
+ 	 "size": 10
+	}
+
+
+
+	match:模糊匹配
+	{
+		"query":{
+			"match":{
+				"author":"wali"
+			}	
+		}
+	}
+	
+	{
+		"query":{
+			"match":{
+				"title":"elasticsearch入门"
+			}	
+		}
+	}
+	match_phrase：习语匹配（全文匹配）
+	{
+		"query":{
+			"match_phrase":{
+				"title":"elasticsearch入门"
+			}	
+		}
+	}
+	
+	multi_match：多字段匹配(查询包含wali的在author和title的)
+	{
+		"query":{
+			"multi_match":{
+				"query":"wali",
+				"fields":["author","title"]
+			}	
+		}
+	}
+	
+	multi_string：语法查询
+	{
+		"query":{
+			"multi_string":{
+				"query":"elasticSearch and 大法",
+				"query":"(elasticSearch AND 大法) OR Python"
+			}	
+		}
+	}
+	{
+		"query":{
+			"multi_string":{
+				"query":"elasticSearch and 大法"
+			}	
+		}
+	}
+	{
+		"query":{
+			"multi_string":{
+				"query":"elasticSearch and 大法",
+				"fields":["title","author"]
+			}	
+		}
+	}
+	
+	结构化查询term
+		{
+		"query":{
+			"term":{
+				"word_count":1000
+				
+			}	
+		}
+	}
+	范围查询
+	{
+		"query":{
+			"range":{
+				"word_count"：{
+					"gte":1000,
+					"lte":2000
+				}
+			}	
+		}
+	}
+	日期
+	{
+		"query":{
+			"range":{
+				"publish_date"：{
+					"gt":"2017-01-01",
+					"lt":now
+				}
+			}	
+		}
+	}
+	filter返回只有true或者false
+	{
+		"query":{
+			"bool":{
+				"filter"：{
+					"term":{
+						"word_count":1000
+					}
+				}
+			}	
+		}
+	}
+	{
+		"query":{
+			"filtered":{
+				"filter"：{
+					"bool":{
+						"should":[
+							{
+							"term":{
+								"price":20
+								}
+							},
+							{
+							"term":{
+									"productID":"SD1002136"
+								}
+							}						
+						],
+						"must_not":{
+							"term":{"price":30}
+						}
+						
+					}
+				}
+			}	
+		}
+	}
+	查询10月之前contents字段包含“ES”的文档
+	{
+		"query": {
+			"filtered":{
+				"query":{
+					"range":{
+						"date":{
+							"lte":"2016-10-01"
+						}
+					}
+				},
+				"filter":{
+					"match":{
+						"contents":"ES"
+					}
+				}
+			}   
+		}
+	}
+	复合查询
+		固定分数查询，只支持filer不支持match
+	查询分数为2的
+	{
+		"query":{
+			"constant_score":{
+				"filter"：{
+					"match":{
+						"title":"ElasticSearch"
+					}
+				},
+				"boost":2
+			}	
+		}
+	}
+	should查询
+	{
+		"query":{
+			"bool":{
+				"should"：[
+			
+					"match":{
+						"author":"瓦力"
+					}
+					"match":{
+						"title":"ElasticSearch"
+					}
+				]
+			}	
+		}
+	}	
+	must查询
+	{
+		"query":{
+			"bool":{
+				"must"：[
+			
+					"match":{
+						"author":"瓦力"
+					}
+					"match":{
+						"title":"ElasticSearch"
+					}
+				]
+			}	
+		}
+	}		
+	{
+		"query":{
+			"bool":{
+				"must"：[
+					"match":{
+						"author":"瓦力"
+					}
+					"match":{
+						"title":"ElasticSearch"
+					}
+				],
+				"filter":[
+					{
+						"term":{
+							"word_count":1000
+						}
+					}
+				]
+			}	
+		}
+	}	
+	must_not
+	{
+		"query":{
+			"bool":{
+				"must_not"：[
+			
+					"match":{
+						"author":"瓦力"
+					}
+					"match":{
+						"title":"ElasticSearch"
+					}
+				]
+			}	
+		}
+	}		
+	
+	_mget
+	指定字段，也可以不指定
+	{
+		"doc":[
+			{
+				"_index":"shakespeare",
+				"_type":"line",
+				"_id":6,
+				"_source":"play_name"
+			}，
+			{
+				"_index":"shakespeare",
+				"_type":"line",
+				"_id":7,
+				"_source":"play_name"
+			}
+		]
+	}
+	get /shakespeare/line/_mget
+	{
+		"ids":["6","28"]
+	}
+	
+	_bulk:批量create update insert delete
+	POST _bulk
+{ "index" : { "_index" : "test", "_type" : "_doc", "_id" : "1" } }
+{ "field1" : "value1" }
+{ "delete" : { "_index" : "test", "_type" : "_doc", "_id" : "2" } }
+{ "create" : { "_index" : "test", "_type" : "_doc", "_id" : "3" } }
+{ "field1" : "value3" }
+{ "update" : {"_id" : "1", "_type" : "_doc", "_index" : "test"} }
+{ "doc" : {"field2" : "value2"} }
+	
 	
