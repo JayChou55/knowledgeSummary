@@ -1,4 +1,4 @@
-idea使用mavenn命令 要配置
+﻿idea使用mavenn命令 要配置
 	<build>  
         <pluginManagement>  
             <plugins>  
@@ -33,3 +33,145 @@ idea使用mavenn命令 要配置
 生成eclipse项目文件: mvn eclipse:eclipse
 查看帮助信息：mvn help:help 或 mvn help:help -Ddetail=true
 查看插件的帮助信息：mvn <plug-in>:help，比如：mvn dependency:help 或 mvn ant:help 等等。	
+
+=================================================================安装===================================================================
+
+maven 安装 首先要下载一上maven 的安装文件 使用wget下载 wget http://mirror.bit.edu.cn/apache/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz
+下载完成后解压 maven ：tar zxvf 
+apache-maven-3.5.0-bin.tar.gz
+配置MAVEN_HONE 环境变量
+编辑 vim /etc/profile 加入下面这两句
+export  MAVEN_HOME=/usr/local/apache-maven-3.5.0
+export PATH=$PATH:$MAVEN_HOME/bin
+  
+or
+
+vim /etc/profile
+
+M2_HOME=/data/maven
+export PATH=${M2_HOME}/bin:${PATH}
+
+配置生效 source /etc/profile
+执行mvn -version 看到如果图说明配置成功
+
+
+=================================================================配置===================================================================
+配置阿里云的maven repository 进入 maven conf目录下 cd 
+/usr/local/apache-maven-3.5.0/conf
+编辑settings.xml加入阿里云的maven仓库 vimsettings.xml
+ <mirror>
+
+        <id>nexus-aliyun</id>
+
+        <mirrorOf>*</mirrorOf>
+
+        <name>Nexus aliyun</name>
+
+        <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+
+    </mirror>
+
+
+3.修改Maven安装目录下的 conf/文件夹内的setting.xml文件，新增一行：<localRepository>/data1/mavenRepo</localRepository>（表示本地仓库的地址为：D:\Java\m2\repository）；
+
+
+
+
+
+
+
+=================================================================流程===================================================================
+validate 验证项目是否正确以及必须的信息是否可用  
+compile 编译源代码  
+test 测试编译后的代码，即执行单元测试代码  
+package 打包编译后的代码，在target目录下生成package文件  
+integration-test 处理package以便需要时可以部署到集成测试环境  
+verify 检验package是否有效并且达到质量标准  
+install 安装package到本地仓库，方便本地其它项目使用  
+deploy 部署，拷贝最终的package到远程仓库和替他开发这或项目共享，在集成或发布环境完成  
+ 
+以上的phase是有序的（注意实际两个相邻phase之间还有其他phase被省略，完整phase见lifecycle），下面一个phase的执行必须在上一个phase完成后
+
+若直接以某一个phase为goal，将先执行完它之前的phase，如mvn install
+
+将会先validate、compile、test、package、integration-test、verify最后再执行install phase
+
+
+
+
+
+
+=================================================================示例===================================================================
+假设现有项目结构如下
+
+	dailylog-parent
+	|-dailylog-common
+	|-dailylog-web
+
+	三个文件夹处在同级目录中
+	dailylog-web依赖dailylog-common
+	dailylog-parent管理dailylog-common和dailylog-web。
+根据资料已知：
+
+	参数	全称	释义	说明
+	-pl	--projects	Build specified reactor projects instead of all projects	
+	选项后可跟随{groupId}:{artifactId}或者所选模块的相对路径(多个模块以逗号分隔)
+
+	-am	--also-make	If project list is specified, also build projects required by the list	
+	表示同时处理选定模块所依赖的模块
+
+	-amd	--also-make-dependents	If project list is specified, also build projects that depend on projects on the list	
+	表示同时处理依赖选定模块的模块
+
+	-N	--Non-recursive	Build projects without recursive	
+	表示不递归子模块
+
+	-rf	--resume-from	Resume reactor from specified project	
+	表示从指定模块开始继续处理
+
+以下是在maven-3.3.9中的试验
+
+1. 在dailylog-parent目录运行`mvn clean install -pl org.lxp:dailylog-web -am`，结果
+
+	dailylog-common成功安装到本地库
+	dailylog-parent成功安装到本地库
+	dailylog-web成功安装到本地库
+	该命令等价于`mvn clean install -pl ../dailylog-web -am`
+
+2. 在dailylog-parent目录运行`mvn clean install -pl ../dailylog-common -am`，结果
+
+	dailylog-common成功安装到本地库
+	dailylog-parent成功安装到本地库
+3. 在dailylog-parent目录运行`mvn clean install -pl ../dailylog-common -amd`，结果
+
+	dailylog-common成功安装到本地库
+	dailylog-web成功安装到本地库
+	由于dailylog-parent并不依赖dailylog-common模块，故没有被安装
+
+4. 在dailylog-parent目录运行`mvn clean install -pl ../dailylog-common,../dailylog-parent -amd`，结果
+
+	dailylog-common成功安装到本地库
+	dailylog-parent成功安装到本地库
+	dailylog-web成功安装到本地库
+5. 在dailylog-parent目录运行`mvn clean install -N`，结果
+
+	dailylog-parent成功安装到本地库
+	-N表示不递归，那么dailylog-parent管理的子模块不会被同时安装
+
+6. 在dailylog-parent目录运行`mvn clean install -pl ../dailylog-parent -N`，结果
+
+	dailylog-parent成功安装到本地库
+	在dailylog-parent目录运行`mvn clean install -rf ../dailylog-common`，结果
+
+	dailylog-common成功安装到本地库
+	dailylog-web成功安装到本地库
+
+
+mvn install:install-file -Dfile=sojson-demo.jar -DgroupId=com.sojson -DartifactId=com.sojson.demo -Dversion=1.0 -Dpackaging=jar
+
+mvn install:install-file         //mvn 命令
+-Dfile=sojson-demo.jar　         //要添加的包
+-DgroupId=com.sojson 　　　　　　//pom文件对应的groupId
+-DartifactId=com.sojson.demo    //pom文件对应得artifactId
+-Dversion=1.0　　　　　　　　　 //添加包的版本
+-Dpackaging=jar 

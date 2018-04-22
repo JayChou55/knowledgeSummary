@@ -1,6 +1,6 @@
-github dokcer——library      https://github.com/docker-library/official-images 
+﻿github dokcer——library      https://github.com/docker-library/official-images 
 
-
+命令选项，常用的指令包括-t指定镜像的名字，-f显示指定Dockerfile，如果不使用-f，则默认将上下文路径下的名为Dockerfile的文件认为是构建镜像的"Dockerfile"。
 
 FROM 镜像名	（或者镜像：标签）
 MAINTAINER <name> 作者信息
