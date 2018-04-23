@@ -1,0 +1,13 @@
+下载	
+    wget http://mirror.downloadvn.com/apache/hbase/1.2.6/hbase-1.2.6-bin.tar.gz
+
+解压到opt下
+    tar zxvf ./hbase-1.2.6-bin.tar.gz -C /opt/
+进入bin目录执行启动
+    ./start-hbase.sh
+输入jps看是否ok
+
+下载初始化脚本
+    wget https://github.com/naver/pinpoint/blob/master/hbase/scripts/hbase-create.hbase
+执行
+     ./hbase shell /data1/pinpoint/hbase/hbase-create.hbase
