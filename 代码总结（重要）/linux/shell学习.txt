@@ -1,0 +1,205 @@
+	Linux Shell中的变量分为“系统变量”和“用户自定义变量”，可以通过set命令查看那系统变量
+	系统变量：$HOME、$PWD、$SHELL、$USER等等
+
+	
+	
+	==================获取sh shell 当前文件的绝对路径=======================
+	#!/bin/bash
+	echo '$0: '$0
+	echo "pwd: "`pwd`	#执行程序所处的当前地址
+	echo "scriptPath1: "$(cd `dirname $0`; pwd)   #sh文件的地址
+	
+	
+	
+	显示当前shell中所有变量  :    set
+	变量＝值 （例如STR=abc）
+	等号两侧不能有空格
+	变量名称一般习惯为大写
+	双引号和单引号有区别，双引号仅将空格脱意，单引号会将所有特殊字符
+	x=1
+	echo $x
+	unset x
+如：
+	STR="hello world"
+	A=9
+	unset A 撤销变量 A
+	readonly B=2 声明静态的变量 B=2 ，不能 unset
+	export 变量名 可把变量提升为全局环境变量，可供其他shell程序使用
+
+	A=`ls -la` 反引号，运行里面的命令，并把结果返回给变量A
+	A=$(ls -la) 等价于反引号
+如：
+	TIME=‘data "+%Y%m%d%H%M"‘
+	GIT_REVISION= ‘git log -1 --pretty=format:"%h"‘
+	
+	
+	$? 表示上一个命令退出的状态
+	$$ 表示当前进程编号
+	$0 表示当前脚本名称
+	$n 表示n位置的输入参数（n代表数字，n>=1）
+	$# 	表示参数的个数，常用于循环
+	$*和$@ 都表示参数列表 
+	
+	$* 和 $@ 都表示传递给函数或脚本的所有参数，不被双引号" "包含时，都以$1  $2  … $n 的形式输出所有参数
+	当它们被双引号" "包含时，"$*" 会将所有的参数作为一个整体，以"$1 $2 … $n"的形式输出所有参数；"$@" 会将各个参数分开，以"$1" "$2" … "$n" 的形式输出所有参数
+=======================================================================
+	运算：
+		格式 :expr m + n 或$((m+n)) 注意expr运算符间要有空格
+如：
+	例如计算（2 ＋3 ）×4 的值
+	1 .分步计算	S=`expr 2 + 3`	expr $S \* 4
+	2.一步完成计算
+		expr `expr 2 + 3 ` \* 4
+		echo `expr \`expr 2 + 3\` \* 4`
+		或
+		$(((2+3)*4))
+=======================================================================
+	for循环
+第一种
+	for N in 1 2 3
+	do
+		echo $N
+	done
+	或
+	for N in 1 2 3; do echo $N; done
+	或
+	for N in {1..3}; do echo $N; done
+第二种：
+	for ((i = 0; i <= 5; i++))
+	do
+		echo "welcome $i times"
+	done
+	或
+	for ((i = 0; i <= 5; i++)); do echo "welcome $i times"; done
+=======================================================================
+	while循环
+第一种
+	while expression
+	do
+	command
+	…
+	done
+第二种
+	i=1
+	while ((i<=3))
+	do
+	  echo $i
+	  let i++
+	done	
+=======================================================================
+	case语法
+	格式
+		case $1 in
+		start)
+			echo "starting"
+			;;
+		stop)
+			echo "stoping"
+			;;
+		*)
+			echo "Usage: {start|stop} “
+		esac
+		
+	read命令
+	read -p(提示语句)-n(字符个数) -t(等待时间) 
+	如
+	read -p "please input your name: " NAME
+	然后
+	echo $NAME
+=======================================================================
+	if语法
+	if condition 
+	then   
+	 statements
+	 [elif condition 
+	    then statements. ..]
+	 [else
+	     statements ]
+	 fi	
+如：（注意空格）
+	#!/bin/bash
+	read -p "please input your name:" NAME
+	#printf '%s\n' $NAME
+	if [ $NAME = root ]
+			then
+					echo "hello ${NAME},  welcome !"
+			elif [ $NAME = itcast ]
+					then
+							echo "hello ${NAME},  welcome !"
+			else
+					echo "SB, get out here !"
+	fi
+	
+	[ condition ] (注意condition前后要有空格)
+	#非空返回true，可使用$?验证（0为true，>1为false）
+	[ itcast ]
+
+	#空返回false
+	[  ]
+	
+	[ condition ] && echo OK || echo notok
+	条件满足，执行后面的语句
+	
+======================================================
+	= 字符串比较
+	-lt 小于
+	-le 小于等于
+	-eq 等于
+	-gt 大于
+	-ge 大于等于
+	-ne 不等于
+如：(注意空格区别)
+	[ 3 -eq 3 ]
+	echo $?
+	[ 3=3 ]
+	echo $?
+	
+	-r 有读的权限
+	-w 有写的权限
+	-x 有执行的权限
+	-f 文件存在并且是一个常规的文件
+	-s 文件存在且不为空
+	-d 文件存在并是一个目录
+	-b文件存在并且是一个块设备
+	-L 文件存在并且是一个链接
+
+================================================================
+语法
+ [ function ] funname [()]
+{
+    action;
+    [return int;]
+}
+
+function start()  / function start / start()
+
+如：
+	#!/bin/bash
+	
+	function fSum()
+	{
+			echo $1,$2
+			return $(($1+$2))
+	}
+	total=$?
+	echo "结果"：$total
+	fSum 5,7
+	echo $total,%?;
+	
+	结果：0
+		  5，7
+		  12，0
+注意
+1.必须在调用函数地方之前，先声明函数，shell脚本是逐行运行。不会像其它语言一样先预编译
+2.函数返回值，只能通过$? 系统变量获得，可以显示加：return 返回，如果不加，将以最后一条命令运行结果，作为返回值。 return后跟数值n(0-255)
+
+===============================================================
+脚本调试
+sh -vx helloWorld.sh
+或者在脚本中增加set -x
+	
+
+
+
+
+	
