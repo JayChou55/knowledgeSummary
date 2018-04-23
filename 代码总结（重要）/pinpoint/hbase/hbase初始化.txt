@@ -9,5 +9,5 @@
 
 下载初始化脚本
     wget https://github.com/naver/pinpoint/blob/master/hbase/scripts/hbase-create.hbase
-执行
+在bin目录下执行
      ./hbase shell /data1/pinpoint/hbase/hbase-create.hbase
