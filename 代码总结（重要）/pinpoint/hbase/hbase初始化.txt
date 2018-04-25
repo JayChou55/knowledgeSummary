@@ -1,0 +1,30 @@
+下载	
+    wget http://mirror.downloadvn.com/apache/hbase/1.2.6/hbase-1.2.6-bin.tar.gz
+
+解压到opt下
+    tar zxvf ./hbase-1.2.6-bin.tar.gz -C /opt/
+进入bin目录执行启动
+    ./start-hbase.sh
+输入jps看是否ok
+
+下载初始化脚本
+    wget https://github.com/naver/pinpoint/blob/master/hbase/scripts/hbase-create.hbase
+在bin目录下执行
+     ./hbase shell /data1/pinpoint/hbase/hbase-create.hbase
+
+hbase  
+pinpoint-agent 
+pinpoint-agent-1.7.2.tar.gz //用于启动服务java -javaagent:/data1/pinpoint/pinpoint-agent/pinpoint-bootstrap-1.7.2.jar -Dpinpoint.agentId=eureka -Dpinpoint.applicationName=eureka -jar eureka.jar 
+pinpoint-collector-1.7.2.war  //收集的
+pinpoint-web-1.7.2.war	//展示页面
+
+启动号hbase后，对应有start 和shut，不行就直接kill杀死
+
+然后启动pinpoint-collector-1.7.2.war pinpoint-web-1.7.2.war两个对应tomcat，把webapp下内容删了，复制到对应webapp下改为ROOT.war 改端口后启动，保证不重复
+
+最后mkdir 比如pinpoint-agent文件夹 改下conf对应的监控收集的主机地址，9994端口要在监控收集段暴露
+启动：
+	java -javaagent:/data1/pinpoint/pinpoint-agent/pinpoint-bootstrap-1.7.2.jar -Dpinpoint.agentId=eureka -Dpinpoint.applicationName=eureka -jar eureka.jar 
+
+
+
