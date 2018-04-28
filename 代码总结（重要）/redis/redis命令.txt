@@ -1,0 +1,129 @@
+选择数据库（16个）
+	select 0
+	select 1
+查询key
+	keys *, keys xxx,keys xx*...
+返回随机key
+	randomkey
+返回类型 
+	type xxx
+判断有没有 
+	exists key
+删除 
+	del key
+清库
+	flushdb
+	flushall
+append
+	append k1 12345
+	返回	xx12345
+strlen
+	strlen k1
+	返回 6
+加（必须数字）
+	incr k1
+	incrby k1 10
+	
+减	
+	decr k1
+	decrby k1 10
+getrange获取范围内
+	getrange k1 0 -1
+	xx12345
+	getrange k1 0 3
+	xx12
+
+setex(set with expire)
+	setex k1 10	v4（设置k1存货10秒值为k4）
+
+setnx(set if not exist)
+	set k1 v11(如果k1有值v11不会被设进去)
+	
+mset(批量设置)
+	mset k1 v1 k2 v2 k3 v3
+mget
+
+msetnx（如果批量中有个不满足 都不会满足）
+
+=====================List=================================
+LPUSH list01 123456
+5
+LRANGE list01 0 -1
+5
+4
+3
+2
+1
+RPUSH list02 123456
+5
+LRANGE list02 0 -1
+1
+2
+3
+4
+5
+lpop list01
+5
+lpop list02
+1
+rpop list01
+1
+rpop list02
+5
+LRANGE list01 0 -1
+4
+3
+2	
+================================hash===============	
+hset user id 11
+get user id
+返回 11
+
+hmset
+hmget
+hgetall
+hdel
+hlen
+hexists
+hkeys
+hvalss
+hincrby
+hincrbyfloat
+hsenx
+
+===============================sorted set============================
+zadd zset01 60 v1 70 v2 80 v3
+ZRANGE zset01 0 -1
+v1
+v2
+v3
+
+ZRANGE zset01 0 -1 withscores
+v1
+60
+v2
+70
+v3
+80
+
+ZRANGE zset01 60 90
+ZRANGE zset01 (60 (90
+ZRANGE zset01 60 90 limit 2 2
+	
+	
+	
+查询key的生命周期，返回秒数
+	ttl key，不存在返回-1(永久存在),2.8版本后返回-2
+查看数据类型
+	type k1
+	返回 string
+设置生命周期	
+	expire key	10（设置key 为10秒生命周期）
+	
+	
+redis 数据类型
+	String 
+	Hash
+	List
+	Set
+	Zset

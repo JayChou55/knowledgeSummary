@@ -1,0 +1,2 @@
+ docker run -d --name gateway --link eureka:localhost --link auth:pig-auth -p 8087:9999 a0848c48f56d
+

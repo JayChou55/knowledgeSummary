@@ -2,6 +2,12 @@
   $ sudo docker login --username=hanjianrap.com@qq.com registry.cn-hangzhou.aliyuncs.com
 登录registry的用户名是您的阿里云账号全名，密码是您开通服务时设置的密码。
 
+
+
+
+
+
+
 你可以在镜像管理首页点击右上角按钮修改docker login密码。
 
 从registry中拉取镜像：
@@ -35,7 +41,15 @@ sample:
 
 
 example:
+打包：
+	runoob@runoob:~$ docker commit -a "runoob.com" -m "my apache" a404c6c174a2  mymysql:v1 
+	sha256:37af1236adef1544e8886be23010b66577647a40bc02c0885a6600b33ee28057
+	runoob@runoob:~$ docker images mymysql:v1
+	REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+	mymysql             v1                  37af1236adef        15 seconds ago      329 MB
+标记：	
 	docker tag 30955fd00d17 registry.cn-hangzhou.aliyuncs.com/springcloud1/test:1.0 （把imgId设置为仓库地址位置）
+push：
 	docker push registry.cn-hangzhou.aliyuncs.com/springcloud1/test:1.0 （通过docker images 找到您的imageId 并对于改imageId重命名镜像domain到registry内网地址。）
 
 

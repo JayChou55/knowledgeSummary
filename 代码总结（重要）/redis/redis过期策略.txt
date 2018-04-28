@@ -1,0 +1,20 @@
+lru:最近最少使用
+
+random：随机
+
+ttl:time to live 有限时间内
+
+Noevication：永不过期（默认）
+
+
+Volatile-lru:使用LRU算法溢出key，只对设置了过期时间的键
+
+Allkeys-lru：使用LRU算法溢出key
+
+Volatile-random：在过期集合中移除随机的key，只对设置了过期时间的键
+
+Allkeys-random：移除随机的key
+
+Volatile-ttl：移除TTL值最小的key，那些即将过期的
+
+Noevication：不进行移除。针对写操作，只返回错误信息

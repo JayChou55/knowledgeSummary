@@ -40,8 +40,106 @@ Filter过滤器上下文：
 
 
 
-	http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
-
+	GET http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
+	GET http://121.43.189.172:9200/twitter/tweet/		 查结构好像
+	./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.1.1/elasticsearch-analysis-ik-6.1.1.zip
+	PUT http://121.43.189.172:9200/xunwu   直接设置结构
+			{
+		  "settings": {
+			"number_of_replicas": 0
+		  },
+		  "mappings": {
+			"house": {
+			  "dynamic": false,
+			  "properties": {
+				"houseId": {
+				  "type": "long"
+				},
+				"title": {
+				  "type": "text",
+				  "index": "analyzed",
+				  "analyzer": "ik_smart",
+				  "search_analyzer": "ik_smart"
+				},
+				"price": {
+				  "type": "integer"
+				},
+				"area": {
+				  "type": "integer"
+				},
+				"createTime": {
+				  "type": "date",
+				  "format": "strict_date_optional_time||epoch_millis"
+				},
+				"lastUpdateTime": {
+				  "type": "date",
+				  "format": "strict_date_optional_time||epoch_millis"
+				},
+				"cityEnName": {
+				  "type": "keyword"
+				},
+				"regionEnName": {
+				  "type": "keyword"
+				},
+				"direction": {
+				  "type": "integer"
+				},
+				"distanceToSubway": {
+				  "type": "integer"
+				},
+				"subwayLineName": {
+				  "type": "keyword"
+				},
+				"subwayStationName": {
+				  "type": "keyword"
+				},
+				"tags": {
+				  "type": "text"
+				},
+				"street": {
+				  "type": "keyword"
+				},
+				"district": {
+				  "type": "keyword"
+				},
+				"description": {
+				  "type": "text",
+				  "index": "analyzed",
+				  "analyzer": "ik_smart",
+				  "search_analyzer": "ik_smart"
+				},
+				"layoutDesc" : {
+				  "type": "text",
+				  "index": "analyzed",
+				  "analyzer": "ik_smart",
+				  "search_analyzer": "ik_smart"
+				},
+				"traffic": {
+				  "type": "text",
+				  "index": "analyzed",
+				  "analyzer": "ik_smart",
+				  "search_analyzer": "ik_smart"
+				},
+				"roundService": {
+				  "type": "text",
+				  "index": "analyzed",
+				  "analyzer": "ik_smart",
+				  "search_analyzer": "ik_smart"
+				},
+				"rentWay": {
+				  "type": "integer"
+				},
+				"suggest": {
+				  "type": "completion"
+				},
+				"location": {
+				  "type": "geo_point"
+				}
+			  }
+			}
+		  }
+		}
+	
 	curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
 	{
   	"query": { "match_all": {} },
@@ -86,6 +184,21 @@ Filter过滤器上下文：
 		}
 	}
 	
+	完全匹配可能比较严，我们会希望有个可调节因子，少匹配一个也满足，那就需要使用到slop。
+
+	{
+	  "query": {
+		"match_phrase": {
+			"content" : {
+				"query" : "我的宝马多少马力",
+				"slop" : 1
+			}
+		}
+	  }
+	}
+	
+	
+	
 	multi_string：语法查询
 	{
 		"query":{
@@ -112,7 +225,7 @@ Filter过滤器上下文：
 	}
 	
 	结构化查询term
-		{
+	{
 		"query":{
 			"term":{
 				"word_count":1000
@@ -120,6 +233,18 @@ Filter过滤器上下文：
 			}	
 		}
 	}
+	term是代表完全匹配，即不进行分词器分析，文档中必须包含整个搜索的词汇
+
+	{
+	  "query": {
+		"term": {
+		  "content": "汽车保养"
+		}
+	  }
+	}
+	查出的所有文档都包含"汽车保养"这个词组的词汇。
+	使用term要确定的是这个字段是否“被分析”(analyzed)，默认的字符串是被分析的。
+	
 	范围查询
 	{
 		"query":{

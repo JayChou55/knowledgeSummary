@@ -1,0 +1,10 @@
+
+//插件
+{
+  "presets": [			//预先设定插件
+    ["env", { "modules": false }],
+    "stage-2"	//
+  ],
+  "plugins": ["transform-runtime"],//转换
+  "comments": false	//转换为代码不生成注释
+}

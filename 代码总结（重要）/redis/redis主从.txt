@@ -1,0 +1,53 @@
+配置
+	1.配置文件
+		vim redis.conf
+		pidfile /var/run/redis6380.pid
+		port 6380
+		logfile:"6380.log"'
+		dbfilename dump6380.rdb
+	2.查看redis信息是否是主从
+		进入redis命令行
+			info replication
+	3.SLAVEOF 127.0.0.1 6379		
+			
+			
+			
+配从库不配主库
+从库配置：slaveof主库IP主库端口
+修改配置文件
+
+3招：一主二仆，薪火相传，反客为主
+
+启动
+		redis-server /myredis/redis6379.conf
+		redis-cli -p 6379
+	
+比如 在6379传值
+	set k1 v1
+	set k2 v2
+
+	在80端口的终端内 slaveof 127.0.0.1 6379	
+	info replication
+	会发现 都是 80为slave up
+	
+	主从模式只有主机可以写 其他的 都不可以写！从机set会报错 
+	
+	上一个slave可以是下一个slvae的master
+	转slave之前的数据 会清除
+	
+	输入：slaveof no one 
+	使当前数据库停止与其他数据库的同步，转成主数据库
+	复制 首次全量(就是第一次会把所有数据全量赋值过来) 后面增量
+	
+	启动哨兵
+	主挂了，从自己投票选一个主回来
+	redis-sentinel /myredis/sentinel.conf
+	vim redis-sentinel
+		sentinel monitor host6379 127.0.0.1 6379 1	(1是投票谁多就是谁当主机)
+	
+	
+	
+	如果原来的主机挂了 然后又回来 他就变slave了
+	
+	
+	 

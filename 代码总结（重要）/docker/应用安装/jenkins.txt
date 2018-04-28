@@ -1,7 +1,11 @@
-﻿ docker run -d -p 8085:8080 -p 50000:50000 --name jenkins --link gitlab:gitlab.com -u root -v /data/jenkins:/var/jenkins_home  -v /data/maven:/usr/local/maven -v /usr/java/jdk1.8.0_11:/usr/local/jdk -v /root/.ssh:/root/.ssh -v /data1/mavenRepo/:/data1/mavenRepo/ -v /data/scripts/:/data/scripts/ -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7   jenkinsci/jenkins:latest
+﻿ ==================================docker方式运行jenkins=====================================
+ docker run -d -p 8085:8080 -p 50000:50000 --name jenkins --link gitlab:gitlab.com -u root -v /data/jenkins:/var/jenkins_home  -v /data/maven:/usr/local/maven -v /usr/java/jdk1.8.0_11:/usr/local/jdk -v /root/.ssh:/root/.ssh -v /data1/mavenRepo/:/data1/mavenRepo/ -v /data/scripts/:/data/scripts/ -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /usr/lib64/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7   jenkinsci/jenkins:latest
  
  
  docker inspect jenkins  //查看环境变量 jenkins 如果执行.sh 编译文件 mvn命令无法执行，查到例如/usr/local/bin
+ 
+==================================添加maven环境变量=====================================
+ 
  docker exec -it jenkins /bin/bash
  //添加软连接
  ln -s /usr/local/maven/bin/mvn /usr/local/bin/
@@ -12,7 +16,6 @@
 
 
 
--v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7  
 
 
 docker pull tomsun28/jenkins:1.1
@@ -21,7 +24,13 @@ wget http://mirrors.jenkins.io/war-stable/latest/jenkins.war
 
 nohup java -Xms256m -Xmx1024m -XX:MaxPermSize=512m -jar jenkins.war --ajp13Port=-1 --httpPort=8085 > jenkins.out 2>&1 &
 
+==================================添加docker命令方式=====================================
 
+方式一:
+	-v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker  -v /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7  
+
+
+方式二:
 apt-get update && \
 apt-get -y install apt-transport-https \
      ca-certificates \
@@ -38,3 +47,52 @@ apt-get -y install docker-ce
 
 
 https://getintodevops.com/blog/the-simple-way-to-run-docker-in-docker-for-ci
+
+Docker学习笔记五：Docker生成jenkins容器，支持Java Web项目持续集成、持续部署
+https://www.cnblogs.com/sishang/p/6511372.html
+
+#!/bin/bash
+  imageId=`sudo docker images|grep -i test|awk '{print $3}'`
+  echo "Test镜像ID = "$imageId 
+  containId=`sudo docker ps -a |grep -i test|awk '{print $1}'`
+  echo "Test容器ID = "$containId
+  project=/var/jenkins_home/workspace/test/src/main/resources/docker
+#判断是否存在旧的Test镜像
+  if test -z "$imageId"
+  then
+     echo "Test镜像不存在"
+  else 
+     if test -z "$containId"
+     then
+         echo "Test容器不存在"
+     else
+         echo "Test容器将要被执行stop命令"
+         sudo docker stop test
+         echo "Test容器处于stop状态"
+     fi
+     echo "旧Test镜像将要被删除"
+     sudo docker rmi -f $imageId
+     echo "成功删除旧Test镜像" 
+  fi
+#Dockerfile所在目录
+  sudo mv $project/Dockerfile /usr
+#切换目录至usr
+  cd /usr
+#将Tms war包拷贝到Dockerfile所在目录下
+  sudo mv /var/jenkins_home/workspace/test/target/test.war . 
+  echo "Test镜像构建中:------->"
+#构建Tms镜像
+  sudo docker build -t test .
+#判断是否存在旧的Tms容器
+  if test -z "$containId"
+  then
+    echo "Test容器不存在"
+  else 
+    echo "旧Test容器将要被删除"
+    sudo docker rm -f $containId
+    echo "成功删除旧Test容器" 
+  fi
+#创建容器
+  echo "开始创建新Test容器"
+  sudo docker run -d -p 8088:8080 -v /usr/logs:/usr/tomcat/logs --name test test
+  echo "新Test容器创建成功"

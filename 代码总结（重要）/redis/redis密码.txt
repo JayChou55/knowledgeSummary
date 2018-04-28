@@ -1,0 +1,9 @@
+config get dir 查看当前位置
+启动
+redis-cli -p6379
+设置密码123456
+config set requirepass "123456"
+输入密码
+auth 123456
+清空密码
+config set requirepass ""

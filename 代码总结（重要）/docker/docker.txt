@@ -9,6 +9,8 @@
 yum erase docker docker-common docker-client docker-compose
 删除镜像/容器等：$ rm -rf /var/lib/docker
 
+设置doker内时间
+-v /etc/localtime:/etc/localtime
 
 
 Centos7 配置文件地址

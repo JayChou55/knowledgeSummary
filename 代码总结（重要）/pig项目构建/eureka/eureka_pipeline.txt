@@ -1,0 +1,33 @@
+#!groovy
+pipeline {
+	agent any
+	
+	environment {
+		REPOSITORY="ssh://git@121.43.189.172:8082/hanjian/test1.git"
+		MODULE="eureka"
+		SCRIPT_PATH="/data/scripts"
+	}
+
+	stages {
+		
+		stage('获取代码'){
+			steps {
+				echo "start fetch code from git:${REPOSITORY}"
+				deleteDir()
+				git	"${REPOSITORY}"
+			}
+		}	
+		stage('编译+单元测试'){
+			steps {
+				echo "start compile"
+			    sh "mvn  clean package"
+			}
+		}
+		stage('构建镜像'){
+			steps {
+				echo "start build image===${SCRIPT_PATH}"
+				sh "${SCRIPT_PATH}/build-images.sh ${MODULE}"
+			}
+		}	
+	}		
+}

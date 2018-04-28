@@ -65,8 +65,8 @@ docker run -d --name head -p 9100:9100 --network esdocker_esnet -v /root/es_dock
 
 查看集群状态
 curl http://192.168.56.101:9200/_cat/health?v
-1
-2
+
+
 查看Head集群状态
 http://192.168.56.101:9100/
 

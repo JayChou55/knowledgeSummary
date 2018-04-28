@@ -1,0 +1,1 @@
+docker run -d --name eureka -p 8086:1030 8d56593595fb

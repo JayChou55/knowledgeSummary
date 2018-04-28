@@ -11,26 +11,35 @@
 	rdb  =====》
 				优势：适合大规模数据恢复；对数据完整和一致性要求不高
 				劣势：在一定间隔时间做一次备份，如果redis意外down掉，就会丢失最后一次快照后的修改
-					  Fork的时候，内存中数据被克隆了一份，大致2倍的膨胀性需要考虑	
+				  	  Fork的时候，内存中数据被克隆了一份，大致2倍的膨胀性需要考虑	
 		
 		保存的是dump.rdb命令：
-			方式1：
+			保存方式1（默认触发方式）：
 			save 300 10 
 				300秒内 改10次自动保存
-			方式2：	
+			方式2（手动）：	
 			save	 save时只管保存，其他不管，全部阻塞。
 			bgsave   bgsave：redis会在后台异步进行快照操作，快照同时还可以响应客户端请求。可以通过lastsave命令获取最后一次成功执行快照的时间
 			
 			flushall 也会产生dump.rdb 不过是空的，没意义。
 		停止：
 			redis-cli config set save ""
+			
+		保存地址：
+			（配置文件）# Note that you must specify a directory here, not a file name.
+			dir /var/redis/6379
+恢复 dump.rdb放入启动目录 就会恢复
+		查看rdb的存放地址
+			进入redis命令行（redis-cli）
+			config get dir
+			
 	aof
 		以日志形式记录每个写操作，将redis的所有写动作记录下来
 		
 		修改conf里面
 			appendonly no =>yes
 			
-		aof优先级大于rdb	
+		aof优先级大于rdb(共存情况下 会先加载aof)
 		aof可以有修复命令 去除文件中不合法的命令
 		
 		策略：
@@ -39,13 +48,26 @@
 				Everysec：出厂默认推荐，异步，每秒记录，如果一秒内宕机，有数据丢失
 				No
 		修复：
-			Redis-check-aof --fix进行修复
+			Redis-check-aof --fix进行修复(把aof放入redis配置文件夹下指定目录中 get config dir 启动)
 		恢复：
 			重启redis然后重新加载
 				
-		Rewrite
+		Rewrite（时间长了文件会越来越大）
 			AOF 持久化是通过保存被执行的写命令来记录数据库状态的，所以AOF文件的大小随着时间的流逝一定会越来越大；影响包括但不限于：对于Redis服务器，计算机的存储压力；AOF还原出数据库状态的时间增加；
 			为了解决AOF文件体积膨胀的问题，Redis提供了AOF重写功能：Redis服务器可以创建一个新的AOF文件来替代现有的AOF文件，新旧两个文件所保存的数据库状态是相同的，但是新的AOF文件不会包含任何浪费空间的冗余命令，通常体积会较旧AOF文件小很多。
 			Auto-aof-rewrite-min-size 设置重写的基准值
 			Auto-aof-rewrite-percentage 设置重写的百分比
-			触发机制：Redis记录上次重写的AOF大小，默认配置是当AOF文件大小是上次rewrite后大小一倍且文件大于64m时触发
+			触发机制：Redis记录上次重写的AOF大小，默认配置是当AOF文件大小是上次rewrite后大小一倍且文件大于64m时触发（64m这个非常小，这是默认配置）
+			
+			劣势
+			文件大于rdb
+			
+			总结：
+			因为RDB文件只用作后备用途，建议只在Slave上持久化RDB文件，而且只要15分钟备份一次就够了，只保留save 900 1这条规则。
+
+
+			如果Enalbe AOF，好处是在最恶劣情况下也只会丢失不超过两秒数据，启动脚本较简单只load自己的AOF文件就可以了。代价一是带来了持续的IO，二是AOF rewrite的最后将rewrite过程中产生的新数据写到新文件造成的阻塞几乎是不可避免的。只要硬盘许可，应该尽量减少AOF rewrite的频率，AOF重写的基础大小默认值64M太小了，可以设到5G以上。默认超过原大小100%大小时重写可以改到适当的数值。
+
+
+			如果不Enable AOF ，仅靠Master-Slave Replication 实现高可用性也可以。能省掉一大笔IO也减少了rewrite时带来的系统波动。代价是如果Master/Slave同时倒掉，会丢失十几分钟的数据，启动脚本也要比较两个Master/Slave中的RDB文件，载入较新的那个。新浪微博就选用了这种架构
+			

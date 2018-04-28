@@ -1,0 +1,1 @@
+docker run -d --name config  --link=eureka:localhost  6654553f032c
