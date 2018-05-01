@@ -1,0 +1,457 @@
+var app = new Vue({
+	el='#app',//定义管理区域
+	data:{
+		content:"Hello World" //定义数据
+	}
+
+})
+
+
+//这个3个都是js表达式 可以直接 会在后面输出添上一个'Lee'字符串
+//1.{{xxxx}}插值表达式写法
+	<div id="app">
+		{{content + 'Lee'}}
+	</div>
+//2.v:text绑定，模板语法
+	<div id="app">
+		<div v:text="content + 'Lee'">		
+		</div>	
+	</div>
+//3.v:html绑定(可以把html标签进行解析)，模板语法
+	<div id="app">
+		<div v:html="content + 'Lee'">		
+		</div>	
+	</div>
+
+	setTimeout(function(){
+		app.$data.content ='bye world'
+
+	},2000)
+
+
+=======================================v-for===========================
+	<div id="#app">
+		<input type="text v-model="inputValue"/>
+			<button v-on:click="handleBtnClick">提交<button/>
+		<ul>
+			<li v-for="item in list">
+		<ul>
+	<div>
+<scrpit>
+	var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			list:['第一课内容'，'第二课的内容'],
+			inputValue:''
+		}，
+		methods:{
+			handleBtnClick:function(){
+			
+				//alert('click')
+				//alert(this.inputValue)
+				this.list.push(this.inputValue)						
+			
+			}
+			
+		}
+	})	
+</script>		
+
+===========================component======================================
+//用is解决一下template的bug<tr is="TodoItem">,虽然是tr但是指的其实是template子组件
+
+	<todo-item  v-bind:content="item"
+				v-bind:index="index"
+				//:是数字，不加冒号字符串,是js表达式
+				:count="0"
+			    v-for="(item,index) in list"
+			    //监听子组件的事件，自定义事件，区别于template:"<li @click='handleItemClick'>{{content}}</li>"这是源生事件
+				//@delete.native="handleItemDelete",这样可以变为源生事件，可以直接触发，不然要this.$emit("delete",this.index)，方式向父组件传播，或者 定义在template中，子组件作为源生事件触发
+			    @delete="handleItemDelete"
+	
+	></todo-item>
+
+	//1.创建了一个TodoItem的全局组件！，可以直接当成标签使用，可以小写
+	Vue.component("TodoItem",{
+	//子组件里面的data必须为函数返回，区别一般组件
+		data:function(){
+			return{
+				number:0
+			}
+		},
+		
+		//props:['content'],//获取这个组件中的属性
+		props:{
+			//对类型进行约束
+			//接受一个叫content的属性
+			content:[Number,String]
+		},
+		//参数校验
+		props:{
+			content：{
+				type:String,
+				//必传
+				required：true,
+				defaulat:'default value',
+				validator:function(value){
+					return (value.length > 5)
+				}
+			}
+		},
+		
+		template:"<li>{{content}}---{{number}}</li>"
+	)) 
+	
+	//2.创建了一个TodoItem的局部组件！
+	var TodoItem = {
+		props:['content','index'],
+		//组件模板，这个是源生事件
+		template:"<li @click='handleItemClick'>{{content}}</li>",
+		methods:{
+			handleItemClick:function(){
+				//alert("click")
+				//向外触发事件，这是自定义事件：<todo-item  @delete="handleItemDelete"></todo-item>，通过$emit向父组件触发事件
+				this.$emit("delete",this.index)
+				
+			}
+		
+		}
+	}
+	
+	var app = new Vue({
+		el='#app',//定义管理区域
+		components:{
+			TodoItem: TodoItem//注册根组件中
+		}
+		data:{
+			list:['第一课内容'，'第二课的内容'],
+			inputValue:''
+		}，
+		methods:{
+			handleItemDelete:function(index){
+				//alert('click')
+				this.list.splice(index,1)
+			
+			}
+			
+		}
+	})	
+	
+	
+=================================改变值触发方式================================
+	<div id="app">
+		{{first}}
+		{{last}}
+		
+		//computed方式
+		{{full}}
+		//methods方式
+		{{full()}}
+	</div>
+
+
+var app = new Vue({
+	el='#app',//定义管理区域
+	data:{
+		first:"Hello World, //定义数据
+		last:"bye",
+		full:fist+last;
+	}
+	//1.
+	watch:{
+		first:function(){
+			this.full = this.first + last;
+		},
+		last:function(){
+			this.full = this.first + last;
+		}
+	
+	}
+	//2.
+	//有缓存，都能用的话优先使用,把这个里面的full理解为变量！
+	computed:{
+		full:function(){
+			return this.first + "" + last;
+		}
+	
+	}
+	computed:{
+		full:{
+			get:function():{
+				return this.first + "" + last;
+			}
+			set:function(value){
+				var arr = value.split(" ");
+				this.first=arr[0];
+				this.last = arr[1];
+			}
+			
+		}
+	
+	}
+	
+	
+	//3.
+	methods:{
+		full:function(){
+			return this.first+ "" +this.last;
+		}
+	
+	
+	}
+})
+====================================样式========================================
+1.class对象绑定方式
+	<script>
+		.activated{
+			color:red;
+		}
+	</script>
+
+	<div id="app">
+	//class对象绑定方式
+		<div @click="handleDivClick"
+			:class="{activated: isActivated}"	//activated样式名称，isActivated是否展现true，false
+		>
+		hello
+	</div>
+	
+	
+	var app = new Vue({
+	el='#app',//定义管理区域
+	data:{
+		isActivated:false;
+	},
+	
+	methods:{
+		hadleDivClick: function(){
+			this.isActivated = !this.isActivated;
+			
+		}
+	}
+})
+	
+2.数组语法
+	<script>
+	.activated{
+		color:red;
+	}
+	</script>
+
+		<div id="app">
+		//class对象绑定方式
+			<div @click="handleDivClick"
+				:class="[activated]"	//activated样式名称，isActivated是否展现true，false
+			>
+			hello
+		</div>
+	
+	
+		var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			activated:"";
+		},
+		
+		methods:{
+			hadleDivClick: function(){
+				if(this.activated==="activated"){
+					this.activated ="";
+				}else{
+					this.activated = "activated";
+				}
+				
+				
+			}
+		}
+	})
+3.style对象方式
+		<div id="app">
+		//class对象绑定方式
+			<div @click="handleDivClick"
+				:style="styleObj"	//activated样式名称，isActivated是否展现true，false
+			>
+			hello
+		</div>
+	
+	
+		var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			styleObj:{
+				color:"black"
+			}
+		},
+		
+		methods:{
+			hadleDivClick: function(){
+				if(this.styleObj==="black"){
+					this.styleObj.color ="red";
+				}else{
+					this.styleObj.color = "black";
+				}
+				
+				
+			}
+		}
+	})
+3.style数组方式,数组把他理解为直接赋值
+		<div id="app">
+		//class对象绑定方式
+			<div @click="handleDivClick"
+				:style="[styleObj,'{fontSize:'20px'}]"	//activated样式名称，isActivated是否展现true，false
+			>
+			hello
+		</div>
+	
+	
+		var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			styleObj:{
+				color:"black"
+			}
+		},
+		
+		methods:{
+			hadleDivClick: function(){
+				if(this.styleObj==="black"){
+					this.styleObj.color ="red";
+				}else{
+					this.styleObj.color = "black";
+				}
+				
+				
+			}
+		}
+	})	
+================================================条件渲染===============================================================================	
+
+	<div id="app">
+		//if是直接不会展示 这个标签，show会展示，但是display：none
+		<div v-if="show" data-test="v-if">
+			hello
+		</div>
+		
+		//判断,if else-if else都要连在一起写
+		<div v-if="show=='a'" data-test="v-if">
+			hello
+		</div>
+		<div v-else-if="show==='b'" data-test="v-if">
+			hello
+		</div>
+		//v-if和v-else要在一起写
+		<div v-else="show" data-test="v-if">
+			hello
+		</div>
+	
+		
+		<div v-show="show" data-test="v-show">
+			hello
+		</div>
+	</div>
+	var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			show:false;
+		});
+	)}	
+	
+=========================================================循环渲染======================================================================	
+push 
+pop	弹出
+shift
+splice 取下标
+sort 排序
+reserve	 反转
+
+
+	<div id="app">
+		//key建议唯一标示用后端返回的ID key="item.id"
+		<div v-for="{{(item,index) of list :key="index">
+			{{item}}--{{index}}
+		</div>
+		//Vue.set(vm.list,1,5) == app.$set(app.list,1,5)	 修改list的角标为1的值变为5
+		
+		<div v-for="item in list">
+			{{item}}
+		</div>
+		<template>
+		//对象内部属性也可以循环
+		<div v-for="item in userInfo">
+			{{item}}
+		</div>
+		//key就是对象内部的属性名称,想改属性，就是改引用也就是赋值！
+		
+		<div v-for="(item,key,index) in userInfo">
+			{{item}}----{{key}}
+		</div>
+		</template
+	</div>
+	var app = new Vue({
+		el='#app',//定义管理区域
+		data:{
+			list:[
+				"hello",
+				"dell",
+				"nice"
+			],
+			list2:[{
+				id:"123123"
+				text:"hello"
+			},{
+			id:"445566"
+				text:"world"
+			
+			}	
+			]，
+			userInfo:{
+				name:"jay",
+				age:"18",
+				gender:"male"
+			}
+			
+		});
+	)}	
+	
+	
+	
+=============================refs========================================
+//是dom元素，如果是子组件，指的是子组件的dom
+<div id="app">
+    <input type="text" ref="input1"/>
+    <button @click="add">添加</button>
+</div>
+<script>
+new Vue({
+    el: "#app",
+    methods:{
+    add:function(){
+        this.$refs.input1.value ="22"; //this.$refs.input1  减少获取dom节点的消耗
+        }
+    }
+})
+</script>
+
+
+===========================================================bus==================================================================
+methods: {  
+   addCart(event) {  
+   Bus.$emit('getTarget', event.target);   
+   }  
+}  
+
+created() {  
+        Bus.$on('getTarget', target => {  
+            console.log(target);  
+        });  
+      }  
+
+==========================================================动态组件=====================================================================
+<component :is="type"></component>
+
+
+v-once 放入缓存
+
+
+	

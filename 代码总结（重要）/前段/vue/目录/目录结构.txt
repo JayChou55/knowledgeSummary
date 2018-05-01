@@ -1,8 +1,8 @@
-基于 vue-cli 脚手架生成项目模板基础上做了些改动，加入了 vue-router ，vuex 等配套设施，本地 dev server 中加入了接口 mock 功能，还增加一个 build server 来预览 build 结果页面，前后端通过 spa 的方式实现分离，并相应做了分离后的联调，部署方案。在这里俺也对整个过程简单做个介绍吧。
+﻿基于 vue-cli 脚手架生成项目模板基础上做了些改动，加入了 vue-router ，vuex 等配套设施，本地 dev server 中加入了接口 mock 功能，还增加一个 build server 来预览 build 结果页面，前后端通过 spa 的方式实现分离，并相应做了分离后的联调，部署方案。在这里俺也对整个过程简单做个介绍吧。
 
 目录结构
 
-   ├── index.html                      入口页面（自动会插入进来）
+   ├── index.html                      入口页面（自动会插入进来，body其实不是源生标签，它是vue的组件）
     ├── build                           构建脚本目录
     │   ├── build-server.js                 运行本地构建服务器，可以访问构建后的页面
     │   ├── build.js                        生产环境构建脚本
@@ -21,7 +21,7 @@
     │   └── hello.js
     ├── package.json                    npm包配置文件，里面定义了项目的npm脚本，依赖包等信息（scripts表示可以执行的一些信息）
     ├── src                             项目源码目录    
-    │   ├── main.js                         入口js文件
+    │   ├── main.js                         入口js文件,主要作用是初始化vue实例并使用需要的插件（如果标红改成es6语法即可，在JavaScipt里面改）
     │   ├── app.vue                         根组件
     │   ├── components                      公共组件目录
     │   │   └── title.vue
@@ -113,7 +113,9 @@ module.exports = {
 }
 
 组件化
-
+	Vue.component("TodoItem",{
+		template:"<li>todo item</li>"
+	)) //创建了一个TodoItem的全局组件，可以直接当成标签使用比如<todo-item v-for="item in list"></todo-item>
 整个应用通过 vue 组件的方式搭建起来，通过 vue-router 控制相应组件的展现，组件树结构如下：
 
    app.vue                         根组件（整个应用只有一个）
