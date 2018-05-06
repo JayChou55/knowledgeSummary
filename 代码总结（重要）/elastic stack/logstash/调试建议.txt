@@ -1,0 +1,12 @@
+http做input方便录入数据，可以结合reload特性，stdin无法reload
+stdout做output codec使用rubydebug即使查看解析结果
+
+input{
+	http{port => 7474}
+}
+filter{}
+output{
+	stdout{
+		codec => rubydebug
+	}
+}

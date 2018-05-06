@@ -1,0 +1,35 @@
+cluster.name
+node.name
+node.master/node.data/data.ingest
+netsork.host建议显示指定内网ip，不要偷懒直接设为0.0.0.0
+doscovery.zen.oing.unicast.hosts设定为集群其他节点地址
+discovery.zen.minimum_master_nodes一般设为2
+path.data/path.log
+除上述参数外根据需要增加其他静态配置参数
+
+动态设定参数transient 和 persistent两种，前者会集群重启后丢失，后者不会，都会覆盖elasticsearch.yml配置
+put /_cluster/setting
+{
+	"persistent":{
+		"discovery.zen.minimum_master_nodes":2
+	},
+	"transient":{
+		"indices.store.throttle.max_bytes_per_sec":"50mb"
+	}
+
+
+}
+
+jvm内存建议
+	不要超过31g
+	预留一般给操作系统，用来作文件缓存
+	
+	搜索类项目建议1:16以内 1gb内存搞16gb数据
+	日志类1:48~1:96
+	
+	假设总数据量1tb，3个node，1个副本，每个node存储数据量为2tb/3=666gb，即为700g左右，做20%预留空间，每个要850gb
+		如果搜索类项目，每个node内存850gb/16=53gb 大于31gb，31*16=496，即每个node最多496gb，所以至少5个node
+		如果日志类型，每个node内存850gb/48=18gb，因此3个节点足够
+		
+	搜索场景，但shard大小不超过15gb，日志场景，单shard不超过50g，越大查询性能月底，
+此时估算索引数据大小，除以单shard可以得到分片数	

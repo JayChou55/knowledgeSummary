@@ -1,0 +1,42 @@
+==========================filter-data===================================
+将日期字符串解析为日期类型，然后替换@timestamp字段或者指定的其他字段
+filter{
+	date{
+		match => ["logdate","MMM dd yyyy HH:mm:ss"]
+	}
+}
+{
+	"logdate":"Jan 01 2018 12:02:08"
+}
+{
+	"@version" => "1",
+	"host" => "MacBook-Pro-2.local"
+	"logdate" => "Jan 01 2018 12:02:08"
+	"@timestamp" => 2018-01-01T04:02:08.000Z
+	
+}
+==========================filter-grok===================================
+把非结构化数据转化成为结构化数据
+一种正则具体百度
+https://github.com/logstash-plugins/logstash-patterns-core/tree/master/patterns
+
+==========================filter-mutate convert===================================
+增加字段
+转换
+filter{
+	mutate{
+		convert => {"age"=>"integer"}
+	}
+}
+==========================filter-json===================================
+
+==========================filter-geoip===================================
+ip转换地址
+
+filter{
+	geoip{
+		source => "ip"
+	}
+
+}
+==========================filter-ruby===================================

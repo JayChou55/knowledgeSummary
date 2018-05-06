@@ -1,0 +1,146 @@
+ELK 性能(1) — Logstash 性能及其替代方案 https://www.cnblogs.com/richaaaard/p/6109595.html
+
+
+
+
+input/output
+Codec(Code/Decode)
+
+input{
+	stdin{
+		codec => line
+	}
+
+}
+filter{}
+
+output{
+	stdout{
+		codec => json
+	}
+	
+}
+//以管道形式启动输出 
+echo "foo 
+bar
+"|bin/logstash -f imooc/codec.conf
+
+
+
+=========================input插件-stdin===============================
+stdin
+	codec
+	type类型string
+	tags类型为array，自定义事件的tag
+	add_field类型为hash，为事件添加字段
+例子：	
+input{
+	stdin{
+		codec => "plain"
+		tags => ["test"]
+		type => "std"
+		add_field => {"key"=>"value"}
+	}
+}
+
+output{
+	stdout{
+		codec =>"rubydebug"
+	}
+}
+
+输出为
+{
+	"type"=>"std",
+	"@version"=>"1",
+	"message" => "test",
+	"@timestamp" => 2018-03-06T16:19:80.841Z,
+	"key"=>"value",
+	"tags"=>[
+		[0]"test"
+	],
+	"host"=>"MacBook-Pro-2.local"
+
+
+}
+
+=========================input插件-file===============================
+例子：
+input{
+	file{
+		path => ["/var/log/access_log","/var/log/err_log"],
+		type => "web"
+		start_position=>"beginning"
+	}
+}
+调试：
+input{
+	file{
+		path => ["/var/logs/*.log"],
+		sincedb_path => "/dev/null" #每次读取从头读
+		start_position=>"beginning"
+		ignore_older => 0
+		close_older => 5
+		discover_interval => 1
+		
+	}
+}
+
+output{
+	stdout{
+		codec => rubydebug{}
+	}
+}
+
+=================================Input Plugin-kafka==================================
+input{
+	kafka{
+		zk_connect => "kafka:2181"
+		group_id => "logstash"
+		"topic_id" => "apache_logs"
+		consumer_threads => 16
+		
+	}
+}
+=================================Codec Plugin==================================
+作用于input和output plugin 负责数据转换
+常见的codec有
+	plain读取原始内容
+	dots将内容简化为点进行输出
+	rubydebug将logstash events按照ruby格式输出，方便调试
+	lune处理带有换行符的内容
+	json处理json的内容
+	multiline处理多行数据内容
+	
+multiline例子
+	Exception in thread "main"java.langNullpoitnexception
+		at com.exanple.book.getTitle
+		at com.exanple.book.getTitle22
+		
+	input{
+		stdin{
+			codec => multine{
+				pattern => "^\s" #以空格开头
+				what => "previous"	#按上一行内容进行处理
+			}
+		}
+	}	
+	output{
+		stdout{
+			codec => rubydebug
+		}
+	}
+	例子2时间戳形式
+	[2015-08-24 11:49:48,454][INFO][env ][sdsdasdasdasda]
+		
+	input{
+		stdin{
+			codec => multine{
+				pattern => "^\[%{TIMESTAMP_ISO8601}\]" #匹配所有时间戳形式的开头行
+				negate => true #取反，凡是不是时间戳开头的按照下面previous的按上一行内容处理
+				what => "previous"	#按上一行内容进行处理
+			}
+		}
+	}	
+	
+
