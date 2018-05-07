@@ -1,0 +1,62 @@
+nginx 日志 log_format 及字段说明
+1、log_format 普通格式
+1
+2
+3
+log_format main '$remote_addr - $remote_user [$time_local] $request '
+                '"$status" $body_bytes_sent "$http_referer" '
+                '"$http_user_agent" "$http_x_forwarded_for" "$request_time" "$upstream_response_time"';
+2、log_format JSON 格式
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+log_format logJson '{
+                         "@timestamp": "$time_local", '
+                         '"@fields": { '
+                         '"remote_addr": "$remote_addr", '
+                         '"remote_user": "$remote_user", '
+                         '"body_bytes_sent": "$body_bytes_sent", '
+                         '"request_time": "$request_time", '
+                         '"status": "$status", '
+                         '"request": "$request", '
+                         '"request_method": "$request_method", '
+                         '"http_referrer": "$http_referer", '
+                         '"body_bytes_sent":"$body_bytes_sent", '
+                         '"http_x_forwarded_for": "$http_x_forwarded_for", '
+                         '"http_user_agent": "$http_user_agent" }
+                         }';
+3、指定日志格式
+1
+2
+access_log  /data/logs/nginx/access.log  logJson buffer=32k;
+access_log  /data/logs/nginx/access.log  main buffer=32k;　
+4、字段释义
+字段
+说明
+$remote_addr	客户端地址
+$remote_user	客户端用户名称
+$time_local	访问时间和时区
+$request	请求的URI和HTTP协议
+$http_host	请求地址，即浏览器中你输入的地址（IP或域名）
+$status	HTTP请求状态
+$upstream_status	upstream状态
+$body_bytes_sent	发送给客户端文件内容大小
+$http_referer	url跳转来源
+$http_user_agent	用户终端浏览器等信息
+$ssl_protocol	SSL协议版本
+$ssl_cipher	交换数据中的算法
+$upstream_addr	后台upstream的地址，即真正提供服务的主机地址
+$request_time	整个请求的总时间
+$upstream_response_time	请求过程中，upstream响应时间

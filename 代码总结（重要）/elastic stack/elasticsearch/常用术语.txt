@@ -36,6 +36,10 @@ Filter过滤器上下文：
 1 查询上下文中，查询操作不仅仅会进行查询，还会计算分值，用于确定相关度；在过滤器上下文中，查询操作仅判断是否满足查询条件
 
 2 过滤器上下文中，查询的结果可以被缓存。	
+
+analyzer：
+全文搜索引擎会用某种算法对要建索引的文档进行分析， 从文档中提取出若干Token(词元)， 这些算法称为Tokenizer(分词器)；这些Token会被进一步处理， 比如转成小写等， 这些处理算法被称为Token Filter(词元处理器), 被处理后的结果被称为Term(词)， 文档中包含了几个这样的Term被称为Frequency(词频)。 引擎会建立Term和原文档的Inverted Index(倒排索引)， 这样就能根据Term很快到找到源文档了。 
+文本被Tokenizer处理前可能要做一些预处理， 比如去掉里面的HTML标记， 这些处理的算法被称为Character Filter(字符过滤器)， 这整个的分析算法被称为Analyzer(分析器)。
 查询	
 
 	GET http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
@@ -47,53 +51,52 @@ Filter过滤器上下文：
 			"index":{
 				"number_of_replicas": 0,
 				"number_of_shards": 1,
-				"analyzer":{
-					"autosuggest_analyzer":{
-						"filter":[
-							"lowercase",
-							"asciifolding",
-							"autosuggest_filter"						
-						],
-						"tokenizer":"standard",
-						"type":"custom"					
-					}					
+				"analysis"{
+					"analyzer":{
+						"autosuggest_analyzer":{
+							"filter":[
+								"lowercase", #一个 lowercase 类型的分词器可以看做Letter Tokenizer分词和Lower case Token Filter的结合体。即先用Letter Tokenizer分词，然后再把分词结果全部换成小写格式。
+								"asciifolding",
+								"autosuggest_filter"						
+							],
+							"tokenizer":"standard",
+							"type":"custom"					
+						},
+						"ngram_analyzer":{
+							"filter":[
+								"lowercase",
+								"asciifolding",
+								"ngram_filter"
+							],
+							"tokenizer":"standard",
+							"type":"custom"
+						}
 				},
-				"ngram_analyzer":{
-					"filter":[
-						"lowercase",
-						"asciifolding",
-						"ngram_filter"
-					],
-					"tokenizer":"standard",
-					"type":"custom"
-				
-				},
-				"filter":{
-					"autosuggest_filter":{
-						"max_gram":"20",
-						"min_gram":"1",
-						"token_chars":[
-							"letter",
-							"digit",
-							"punctuation",
-							"symbol"
-						],
-						"type":"edge_ngram"
-					},
-					"ngram_filter":{
-						"max_gram":"20",
-						"min_gram":"1",
-						"token_chars":[
-							"letter",
-							"digit",
-							"punctuation",
-							"symbol"
-						],
-						"type":"ngram"
-						
+					"filter":{
+						"autosuggest_filter":{
+							"max_gram":"20",   #分词后词语的最大长度
+							"min_gram":"1", #分词后词语的最小长度
+							"token_chars":[
+								"letter", #单词，字母 a, b, ï or 京
+								"digit",  #数字
+								"punctuation", #例如 ! or "
+								"symbol"	#例如 $ or √
+							],
+							"type":"edge_ngram" #一个名字为 edgeNGram.的分词。
+						},
+						"ngram_filter":{
+							"max_gram":"20",
+							"min_gram":"1",
+							"token_chars":[
+								"letter",
+								"digit",
+								"punctuation",
+								"symbol"
+							],
+							"type":"ngram"	
+						}
 					}
-					
-				}
+				},
 				"mappings":{
 					"doc":{
 						"dynamic":"false",
@@ -189,11 +192,7 @@ Filter过滤器上下文：
 									}
 								}
 							
-							}
-						
-							
-							
-							
+							}		
 							
 						}				
 					}
