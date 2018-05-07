@@ -38,11 +38,176 @@ Filter过滤器上下文：
 2 过滤器上下文中，查询的结果可以被缓存。	
 查询	
 
-
-
 	GET http://121.43.189.172:9200/twitter/tweet/_search 查询所有数据
 	GET http://121.43.189.172:9200/twitter/tweet/		 查结构好像
 	./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.1.1/elasticsearch-analysis-ik-6.1.1.zip
+	
+	PUT myairbnb{
+		"settings":{
+			"index":{
+				"number_of_replicas": 0,
+				"number_of_shards": 1,
+				"analyzer":{
+					"autosuggest_analyzer":{
+						"filter":[
+							"lowercase",
+							"asciifolding",
+							"autosuggest_filter"						
+						],
+						"tokenizer":"standard",
+						"type":"custom"					
+					}					
+				},
+				"ngram_analyzer":{
+					"filter":[
+						"lowercase",
+						"asciifolding",
+						"ngram_filter"
+					],
+					"tokenizer":"standard",
+					"type":"custom"
+				
+				},
+				"filter":{
+					"autosuggest_filter":{
+						"max_gram":"20",
+						"min_gram":"1",
+						"token_chars":[
+							"letter",
+							"digit",
+							"punctuation",
+							"symbol"
+						],
+						"type":"edge_ngram"
+					},
+					"ngram_filter":{
+						"max_gram":"20",
+						"min_gram":"1",
+						"token_chars":[
+							"letter",
+							"digit",
+							"punctuation",
+							"symbol"
+						],
+						"type":"ngram"
+						
+					}
+					
+				}
+				"mappings":{
+					"doc":{
+						"dynamic":"false",
+						"properties":{
+							"accommodates":{
+								"type":"integer"
+							},
+							"bathrooms":{
+								"type":"integer"
+							},
+							"bed_type":{
+								"type":"text",
+								"fields":{
+									"keyword":{
+										"type":"keyword",
+										"ignore_above":256
+									}
+								}
+							},
+							"bedrooms":{
+								"type":"integer"
+							},
+							"beds":{
+								"type":"integer"
+							},
+							"date_from":{
+								"type":"date",
+								"format":"yyyyMMdd"
+							},
+							"date_to":{
+								"type":"date",
+								"format":"yyyyMMdd"
+							},
+							"has_availability"{
+								"type":"boolean"
+							},
+							"host_image":{
+								"type":"keyword",
+								"ignore_above":256,
+								"index":false #不进行索引
+							},
+							"host_name":{
+								"type":"text",
+								"analyzer":"autosuggest_analyzer",
+								"fields":{
+									"keyword":{
+										"type":"keyword",
+										"ignore_above":256
+									}
+								}
+							},
+							"image":{
+								"type":"keyword",
+								"ignore_above":256
+								"index":false
+							},
+							"listing_url":{
+								"type":"keyword",
+								"ignore_above":256
+							},
+							"location":{
+								"type":"geo_point"
+							},
+							"name":{
+								"type":"text",
+								"analyzer":"autosuggest_analyzer",
+								"fields":{
+									"keyword":{
+										"type":"keyword",
+										"ignore_above":256
+									}
+								}
+							}，
+							"price":{
+								"float"
+							},
+							"property_type":{
+								"type":"text",
+								"fields":{
+									"keyword":{
+										"type":"keyword",
+										"ignore_above":256
+									}
+								}
+							
+							},
+							"room_type":{
+								"type":"text",
+								"fields":{
+									"keyword":{
+										"type":"keyword",
+										"ignore_above":256
+									}
+								}
+							
+							}
+						
+							
+							
+							
+							
+						}				
+					}
+				
+				}		
+			}
+		}
+	
+	}
+	
+	
+	
+	
+	
 	PUT http://121.43.189.172:9200/xunwu   直接设置结构
 			{
 		  "settings": {

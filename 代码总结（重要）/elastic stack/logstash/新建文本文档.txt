@@ -4,7 +4,7 @@ ELK 性能(1) — Logstash 性能及其替代方案 https://www.cnblogs.com/richaaaard/p/61
 
 
 input/output
-Codec(Code/Decode)
+Codec(Code/Decode) #转换
 
 input{
 	stdin{

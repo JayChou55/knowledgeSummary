@@ -1,0 +1,3 @@
+docker run -v /data/logstash/conf.d:/usr/share/logstash/pipeline/:ro -v /tmp:/tmp:ro \
+-v /data/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro --name my-logstash \
+--network host -d docker.elastic.co/logstash/logstash:6.1.1

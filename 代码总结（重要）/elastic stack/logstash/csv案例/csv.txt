@@ -1,0 +1,2 @@
+DateTime,LATITUDE,Longitude,Depth,Magnitude,MagType,NbStations,Gap,DistancemRMS,Source,EventID
+2016/01/01 00:30:04.91,18.0772,-67.1027,19.91,2.80,Md,,125,0,0.44,pr,201601012001 

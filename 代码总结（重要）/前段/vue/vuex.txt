@@ -1,0 +1,82 @@
+首先要先引入
+import { mapGetters,mapMutation } from 'vuex'
+
+
+
+ computed: {
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })//或者写成 ...mapState(['userInfo']),
+	...mapGetters(['descriptCity'])//把descriptCity直接映射过来，调用在标签里面 {{this.descriptCity}}
+  }
+...mapState展开方式，表示把state中user.userInfo映射给userInfo这个属性
+
+methos:{
+	handleCityClick(city){
+		this.$store.commit('changeCity',city)
+	}
+}
+//...mapMutations(['changeCity'])方式,意思是把store里面mutations的changeCity方法映射过来，直接就能用了
+methos:{
+	handleCityClick(city){
+		this.changeCity(city)
+	}
+	//数组形式
+	...mapMutations(['changeCity'])
+}
+//在store文件中定义
+getters:{
+	descriptCity(state){
+		return state.city+' '+"环境不错"
+	}
+}
+
+//在标签中，使用直接<div>{{this.descriptCity}}
+
+
+
+//在main.js中注册全局使用$store.state.
+export function createApp() {
+  const app = new Vue({
+    router,
+    //根组件中注册，全局可以使用$store
+    store,
+    render: h => h(App)
+  })
+  return {
+    app,
+    router,
+    store
+  }
+}
+
+触发事件调用(dispatch==>actions方法=>commit==>mutations方法)：
+	methods:{
+		handleCityClick(city){
+			this.$store.dispatch('changeCity',city)
+		}
+	}
+	//如果不要异步，可以直接调用mutations
+	methods:{
+		handleCityClick(city){
+			this.$store.commit('changeCity',city)
+		}
+	}
+export default new Vuex.Store){
+	state:{
+		city:'上海'
+	},
+	actions:{
+		changeCity(ctx,city){
+			ctx.commit('changeCity',city)
+		}
+		
+	},
+	mutations:{
+		changeCity(state,city){
+			state.city = city
+		}
+	}
+
+
+})
