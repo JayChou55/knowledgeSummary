@@ -25,6 +25,8 @@ echo "foo
 bar
 "|bin/logstash -f imooc/codec.conf
 
+echo "foo bar"|./logstash-6.1.1/bin/logstash -f /data/logstash/codec.conf 
+
 
 
 =========================input²å¼þ-stdin===============================

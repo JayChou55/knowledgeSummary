@@ -1,0 +1,26 @@
+POST _analyze
+{
+  
+  "analyzer": "standard",
+  "text": "hello word"
+}
+
+
+{
+  "tokens": [
+    {
+      "token": "hello",
+      "start_offset": 0,
+      "end_offset": 5,
+      "type": "<ALPHANUM>",
+      "position": 0
+    },
+    {
+      "token": "word",
+      "start_offset": 6,
+      "end_offset": 10,
+      "type": "<ALPHANUM>",
+      "position": 1
+    }
+  ]
+}
