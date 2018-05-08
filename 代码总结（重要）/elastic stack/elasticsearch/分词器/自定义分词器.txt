@@ -1,4 +1,6 @@
-
+通过自定义Character Filters（对原始文本进行过滤）、
+Tokenizer（将原始文本按照一定规则切分为单词，自带如standard、letter按照非字符类分割、whitspace空格、UAX URL EMAIL、NGram和Edge NGram连词分割、Path Hierarchy按照文件路径分割）、
+Token Filter（对于tokenizer输出的单词（term）进行增删修等操作，自带的如 lowercase，stop删除，NGram和Edge NGram ，Synonym添加近义词
 自定义分词器测试
 	POST _analyze
 	{
@@ -6,22 +8,96 @@
 	  "filter": ["lowercase"], 
 	  "text": "HELLO WORLD"
 	}
-es自带分词器
-	Standard
-	Simple
-	Whitespace
-	Stop
-	Keyword
-	Pattern
-	Language
 
 
+	POST _analyze
+	{
+		"text": "a HELLO, WORLD!"
+	  "tokenizer": "standard", 
+	  "filter": ["lowercase",
+		"stop",
+		{
+			"type":"ngram" #最小分割4，最大也是，每4个切一次，HELL ELLO LLOW，4-4是个范围
+			"min_gram":4,
+			"max_gram":4
+			
+		}
+	  ]
+	  
+	}
 
+自定义分词
+	PUT test_index
+	{
+		"setting":{
+			"analysis":{
+				"char_filter":{},
+				"tokenizer":{},
+				"filter"{},
+				"analyzer"{}
+			}
+		}
+	}
+示例
+	PUT test_index
+	{
+	  "settings": {
+		"analysis": {
+		  "analyzer": {
+			"my_custom_analyzer":{
+			  "type":"custom",
+			  "tokenizer":"standard",
+			  "char_filter":[
+				"html_strip"
+				],
+				"filter":[
+					"lowercase",
+					"asciifolding"
+				  ]
+			}
+		  }
+		}
+	  
+	  }
+	}
 
-
-
-
-
+	POST test_index/_analyze
+	{
+	  "analyzer": "my_custom_analyzer", 
+	  "text":"<s>ASDASD sda'x"	  
+	}
+使用场景：
+	创建或者更新文档时，会对相应文档进行分词
+	查询时候
+		查询时分词
+		POST text_index/_search
+		{
+			"query":{
+				"match":{
+					"message":{
+						"query":"hello",
+						"analyzer":"standard"
+					}
+				}
+			}
+		}
+	通过index mapping设置search_analyzer实现
+	PUT test_index{
+		"mappings":{
+			"doc":{
+				"properties":{
+					"title":{
+						"type":"text",
+						"analyzer":"whitespace",
+						"search_analyzer":"standard"
+					}
+				}
+			}
+		}
+	}
+建议：
+	明确是否要分词，不用分词的字段将type设置keyword，节省空间和提高性能
+	善用_analyze API,查看文档具体分词结果
 
 全文搜索引擎会用某种算法对要建索引的文档进行分析， 从文档中提取出若干Token(词元)， 这些算法称为Tokenizer(分词器)；这些Token会被进一步处理， 比如转成小写等， 
 这些处理算法被称为Token Filter(词元处理器), 被处理后的结果被称为Term(词)， 文档中包含了几个这样的Term被称为Frequency(词频)。 引擎会建立Term和原文档的Inverted Index(倒排索引)， 

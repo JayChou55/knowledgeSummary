@@ -1,0 +1,74 @@
+类似数据库表结构定义，作用:
+	定义Index下的字段名
+	类型
+	倒排索引配置
+	
+获取mapping
+	GET /test_index/_mapping
+	
+自定义Mapping的api，mapping一旦设定，禁止修改	
+	PUT my_index
+		{
+			"mappings":{
+			  "doc":{
+			  "dynamic":false,
+				"properties": {
+				  "title":{
+					"type": "text"
+				  },
+				  "name":{
+					"type": "keyword"
+				  },
+				  "age":{
+					 "type": "integer"
+				  }
+				}
+				
+			  }
+			  
+			}
+		}	
+
+	允许新增字段
+		通过dynamic控制
+		true默认允许新增
+		false不允许自动新增，但是文档可以写入，但对字段无法查询
+		strict文档不能写入报错
+	可以试试无法查询到：
+		PUT my_index/doc/1
+				{
+				  "title":"hellow,ord",
+				  "desc":"nothing here"
+				}
+
+				GET my_index/doc/_search
+				{
+				  "query":{
+					"match": {
+					  "desc": "here"
+					}
+					
+				  }
+				}
+获取所有索引
+	GET /_cat/indices?v
+	
+	
+自定义mapping建议
+	写入一条文档到es临时索引中，获取生成的mapping
+	修改步骤1的mapping，自定义相关配置
+	使用2的mapping创建实际所需要索引
+etc:
+	PUT test_index/doc/1
+	{
+		"refferer_code":"200".
+		"metod":"POST",
+		"num":1
+	}
+	获取指定mapping
+	GET test_index/_mapping
+	拿到后进行适当修改
+	
+模板索引
+		xxxx
+	

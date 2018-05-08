@@ -1,0 +1,76 @@
+es自带分词器
+	Standard（默认分词器）
+		按词切分，支持多语言，小写处理
+		POST _analyze
+		{
+		  "analyzer": "standard", 
+		  "text":"ASDASD sda"
+		  
+		}
+		{
+		  "tokens": [
+			{
+			  "token": "asdasd",
+			  "start_offset": 0,
+			  "end_offset": 6,
+			  "type": "<ALPHANUM>",
+			  "position": 0
+			},
+			{
+			  "token": "sda",
+			  "start_offset": 7,
+			  "end_offset": 10,
+			  "type": "<ALPHANUM>",
+			  "position": 1
+			}
+		  ]
+		}
+	Simple：按照非字母切分，去掉符号
+	POST _analyze
+	{
+	  "analyzer": "simple", 
+	  "text":"ASDASD sda'x"
+	  
+	}
+	{
+	  "tokens": [
+		{
+		  "token": "asdasd",
+		  "start_offset": 0,
+		  "end_offset": 6,
+		  "type": "word",
+		  "position": 0
+		},
+		{
+		  "token": "sda",
+		  "start_offset": 7,
+		  "end_offset": 10,
+		  "type": "word",
+		  "position": 1
+		},
+		{
+		  "token": "x",
+		  "start_offset": 11,
+		  "end_offset": 12,
+		  "type": "word",
+		  "position": 2
+		}
+	  ]
+	}
+	Whitespace: 按照空格切分
+	POST _analyze
+	{
+	  "analyzer": "Whitespace", 
+	  "text":"ASDASD sda'x"
+	  
+	}
+	Stop
+	Keyword:不分词
+	Pattern：正则，默认\W+
+		POST _analyze
+		{
+		  "analyzer": "pattern", 
+		  "text":"ASDASD sda'x"
+		  
+		}
+	Language:语言分词器
