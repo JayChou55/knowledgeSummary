@@ -1,0 +1,246 @@
+常用search方式
+GET /_search #对所有数据进行查询
+GET /my_index/_search
+GET /my_index1,my_index2/_search
+GET /my_*/_search
+
+形式
+URI search
+requset body search
+	
+	
+字段类查询，针对某一字段
+	term（单词的查询）
+	match（全文检索）
+	range
+复合查询
+	bool
+
+全文匹配
+	针对text类型字段进行全文检索，会对查询语句进行先分词，match，match——phrase等query类型
+单词匹配
+	不做分词处理，直接匹配字段的倒排索引，如term，term是，range
+
+=============================全文匹配======================	
+	GET /my_index/_search{
+		"query":{
+			"match":{
+				"username":"alfred way"
+			}
+		}
+	}
+	
+	GET /test_index/_search
+	{
+	  "query":{
+		"match":{
+			"username":"alfred way",
+			"operator":"and",
+			#"minimum_should_match":"2"
+		}
+	  }
+	}
+===================================query_string(可能是指定字段那种)=========================	
+	GET /test_index/_search
+	{
+	  "query":{
+		"query_string":{
+			"default_field":"username",
+			"query":"alfred +way \" java"
+		}
+	  }
+	}
+=================================term===============================	
+	GET /test_index/_search
+	{
+	  "query":{
+		"term":{
+			"username":"alfred way",
+			
+		}
+	  }
+	}
+	GET /test_index/_search
+	{
+	  "query":{
+		"terms":{
+			"username":[
+			"alfred",
+			"way"
+			]			
+		}
+	  }
+	}
+	
+	GET /test_index/_search
+	{
+	  "query":{
+		"range":{
+			"age":{
+				"gte":10,
+				"lte":20
+			}
+		}
+	  }
+	}
+	
+	GET /test_index/_search
+	{
+	  "query":{
+		"range":{
+			"date":{
+				"gte":"1990-01-01"
+				#"gte":"now-30y" 
+			}
+		}
+	  }
+	}
+	
+===========================Constant Score Query(指定算分)==================
+GET /test_index/_search
+{
+	"query":{
+		"constant_score":{
+			"filter":{
+				"match":{
+					"username":"alfred"
+				}
+			}
+		}
+	}
+}	
+ 
+===========================Bool Query========================
+一个或多个布尔子句组成
+	filter：只过滤符合条件的文档，不计算相关性得分,有效率，推荐
+	must：文档必须符合must中所有条件，会影响相关性得分
+	must_not：文档必须不符合所有条件
+	should：文档可以符合should中的条件，会影响相关性得分
+	
+GET /test_index/_search
+{
+	"query":{
+		"bool":{
+			"must":[
+				{}
+			],
+			"must_not":[
+				{}
+			],
+			"should":[
+				{}
+			],
+			"filter":[
+				{}
+			]
+		}
+		
+	}
+}
+filter:	
+	GET /test_index/_search
+	{
+		"query":{
+			"bool":{
+				"filter":[
+					{
+						"term":{
+							"username":"alfred"
+						}
+					}
+				]
+			}
+			
+		}
+	}	
+must:
+	GET /test_index/_search
+	{
+		"query":{
+			"bool":{
+				"must":[
+					{
+						"match":{
+							"username":"alfred"
+						},
+						"match":{
+							"username":"chou"
+						}
+					}
+				]
+			}
+			
+		}
+	}
+should:
+	GET /test_index/_search
+	{
+		"query":{
+			"bool":{
+				"should":[
+					{
+						"term":{
+							"job":"java"
+						},
+						"term":{
+							"job":"ruby"
+						}
+					}
+				],
+				"minimum_should_match":2 #至少满足2个条件
+			}	
+		}
+	}
+同时包含should和must，文档不必满足should条件，如果满足条件会增加相关性得分
+	GET /test_index/_search
+	{
+		"query":{
+			"bool":{
+				"must":[
+					"term":{
+						"job":"ruby"
+					}
+				],
+				"should":[
+					{
+						"term":{
+							"username":"ruby" #如果满足这个条件会把对应文档排在前面
+						}
+					}
+				],
+				"minimum_should_match":2 #至少满足2个条件
+			}	
+		}
+	}
+	
+Query Context和Filter Context对比
+
+Query 查询与查询语句最匹配的文档，对所有文档进行相关性算分并排序
+	常用方式：query（match、match_query、term） 、bool中的must和should
+Filter 查与查询语句相匹配的文档
+	方式：bool中的filter与must_not、constant_score中的filter
+	
+	
+	GET /test_index/_search
+	{
+		"query":{
+			"bool":{
+				"must":[
+					"term":{
+						"job":"ruby"
+					}
+				],
+				#不会进行相关性算分，只会过滤符合条件的文档
+				"filter":[
+					{
+						"term":{
+							"username":"ruby" #如果满足这个条件会把对应文档排在前面
+						}
+					}
+				]
+			}	
+		}
+	}
+	
+
+	

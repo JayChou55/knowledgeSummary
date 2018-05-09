@@ -1,0 +1,10 @@
+3种方式
+	from/size
+	scroll
+	search_after
+	
+	GET test_search/_search
+	{
+		"from":1,
+		"size":"2"
+	}
