@@ -1,0 +1,247 @@
+聚合分析
+	GET test_search_index/_search
+	{
+		"size":0,
+		#关键词与query同级
+		"aggs":{
+			#自定义聚合名称
+			"<aggregation_name>":{
+				#聚合分析定义，包括type和body定义
+				"<aggregation_type>":{
+					<aggregation_body>
+				}
+				#子查询
+				[,"aggs":
+					{
+						<sub_aggregation>]+}]?
+					}
+					[,"<aggregation_name_2"]:{...}]*
+				]
+			}
+		}
+	}
+	
+	GET test_search_index/_search
+	{
+		#不需要返回文档列表
+		"size":0
+		"aggs":{
+			#聚合的名字
+			"people_per_job":{
+				"terms":{
+					"field":"job.keyword"	
+				}
+			}
+		}
+	}
+	
+	聚合分析分类
+		Bucket，分桶类型，类似sql中的group by语法
+		Metric，指标分析类型，如计算最大值，最小值，平均值等
+		Popeline，管道分析类型，基于上一级聚合分析结果进行再分析
+		Matrix，矩阵分析类型
+		
+	Metric分析
+		单值分析，输出一个分析结果
+			min，max，avg，sum
+			cardinality 意为集合的势，或者基数，是指不同数值的个数，类似sql中的distinct
+		多值分析，输出多个分析结果
+			stats，extended stats
+			percentile，percentile rank
+			top hits
+		
+		最小值
+			GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"min_age":{
+						"min":{
+							"field":"age"	
+						}
+					}
+				}
+			}
+			GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"avg_age":{
+						"avg":{
+							"field":"age"	
+						}
+					}
+				}
+			}
+			GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"sum_age":{
+						"sum":{
+							"field":"age"	
+						}
+					}
+				}
+			}
+			
+			GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"avg_age":{
+						"avg":{
+							"field":"age"	
+						},
+						#聚合的名字
+					"sum_age":{
+						"sum":{
+							"field":"age"	
+						}
+					}
+					}
+				}
+			}
+			
+===================cardinality===========
+	意为集合的势，或者基数，是指不同数值的个数，类似sql中的distinct		
+			GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"count_of_job":{
+						"cardinality":{
+							"field":"job.keyword"	
+						}
+					}
+				}
+			}
+===================Metric================
+	返回一系列数值，包含min，max，avg，sum和count,还有extends_stats 、percentiles、top_hits包含更多的统计
+		GET test_search_index/_search
+		{
+			#不需要返回文档列表
+			"size":0
+			"aggs":{
+				#聚合的名字
+				"stats_age":{
+					"stats":{
+						"field":"age"	
+					}
+				}
+			}
+		}
+=============================================================Bucket聚合分析=====================	
+	Terms
+	Range
+	Date Range
+	Histogram 以固定间隔策略来分
+	Date Histogram 针对日期的直方图或者柱状图
+	
+	term(如果对text类型数据进行分桶，要把fielddata设为true)
+		GET test_search_index/_search
+		{
+			#不需要返回文档列表
+			"size":0
+			"aggs":{
+				#聚合的名字
+				"jobs":{
+					"terms":{
+						"field":"age",
+						"size":5
+					}
+				}
+			}
+		}
+	Range
+	GET test_search_index/_search
+		{
+			#不需要返回文档列表
+			"size":0
+			"aggs":{
+				#聚合的名字
+				"salary_range":{
+					"range":{
+						"field":"salary",
+						"ranges":[
+							{
+								#可以自定义key，也就是名称
+								"key":"<1000"
+								"to":1000
+							},
+							{
+								"from":1000,
+								"to":20000
+							}
+						]
+					}
+				}
+			}
+		}
+		
+		GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"data_range":{
+						"range":{
+							"field":"birth",
+							"format":"yyyy",
+							"ranges":[
+								{
+									#可以自定义key，也就是名称
+									"from":"1980",
+									"to":1000
+								},
+								{
+									"from":1000,
+									"to":20000
+								}
+							]
+						}
+					}
+				}
+			}	
+
+=========================Bucket+Metric==============
+		GET test_search_index/_search
+			{
+				#不需要返回文档列表
+				"size":0
+				"aggs":{
+					#聚合的名字
+					"jobs":{
+						"terms":{
+							"field":"job.keyword",
+							"size":"10",
+							
+						},
+						"aggs":{
+							#聚合的名字
+							"age_range":{
+								"range":{
+									"field":"age",
+									"ranges":"[
+										{"to":20},
+										{"from":20,"to":30},
+										{"from":30}
+									]
+									
+								}
+							}
+						}
+					}
+				}
+			}		
