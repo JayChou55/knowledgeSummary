@@ -1,0 +1,685 @@
+######################索引操作#####################
+#创建索引
+PUT twitter_v1
+{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 2,
+            "number_of_replicas" : 1,
+            "max_result_window": 100000,
+            "refresh_interval" : "-1"
+        }
+     },
+     "mappings": {
+       "tweet": {
+         "properties": {
+              "no": {
+                 "type": "keyword"
+             },
+             "birthday": {
+                 "type": "date",
+                 "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+             },
+             "age": {
+                 "type": "short"
+             },
+             "shoot": {
+                 "type": "integer"
+             },
+             "code": {
+                 "type": "long"
+             },
+             "score": {
+                 "type": "float"
+             },
+             "extend": {
+                 "type": "double"
+             },
+             "remark": {
+                 "type": "keyword"
+             },
+             "note": {
+                 "type": "text",
+                 "fielddata": true
+             },
+             "introduce": {
+                 "type": "text",
+                 "index": false
+             }
+           }
+         }
+     }
+}
+
+#修改配置
+PUT twitter_v1/_settings
+{
+    "index" : {
+        "number_of_replicas" : 1,
+        "max_result_window": 10000,
+        "refresh_interval" : "1s"
+    }
+}
+
+#添加mapping
+PUT twitter_v1/tweet/_mapping
+{
+    "tweet": {
+       "properties": {
+           "status": {
+               "type": "integer"
+           }
+       }
+    }
+}
+
+#添加别名
+POST /_aliases
+{
+  "actions": [
+    {"add": {"index":"twitter_v1", "alias": "twitter"}}
+  ]
+}
+#删除别名
+POST /_aliases
+{
+  "actions": [
+    {"remove": {"index": "twitter_v1", "alias": "twitter"}}
+  ]
+}
+
+#查看单个索引信息
+GET  twitter_v1
+
+#删除索引
+DELETE  twitter
+
+#查看所有索引
+GET _cat/indices
+
+#查看健康状态
+GET _cluster/health
+
+
+######################文档操作#####################
+#插入--指定ID
+PUT twitter/tweet/1
+{
+    "no" : "0001",
+    "age" : 12,
+    "score": 60.21,
+    "remark": "good boy",
+    "status": 1,
+    "birthday": "2017-10-10 00:00:00",
+    "note": "do"
+}
+
+#插入--自动生成ID
+POST twitter/tweet
+{
+    "no" : "0002",
+    "age" : 13,
+    "score": 10.01,
+    "remark": "good girl",
+    "status": 1,
+    "birthday": "2017-10-11 00:00:00",
+    "note": "did"
+}
+
+#插入--覆盖
+PUT  twitter/tweet/1
+{
+    "age" : 11
+}
+
+#删除--ID
+DELETE /twitter/tweet/1
+
+#删除--条件删除
+POST twitter/tweet/_delete_by_query
+{
+  "query": {
+    "match": {
+      "no": "0001"
+    }
+  }
+}
+
+#更新--部分更新
+POST twitter/tweet/1/_update
+{
+  "doc" : {
+  "status" : "1"
+  }
+}
+
+#更新--脚本更新
+POST twitter/tweet/1/_update?refresh=true
+{
+    "script" : {
+        "inline": "ctx._source.age += params.age",
+        "lang": "painless",
+        "params" : {
+            "age" : 4
+        }
+    }
+}
+
+#更新--条件更新
+POST  twitter/tweet/_update_by_query
+{
+  "script": {
+    "inline": "ctx._source.age++",
+    "lang": "painless"
+  },
+  "query": {
+    "match": {
+      "no": "0002"
+    }
+  }
+}
+
+#查询--ID
+GET twitter/tweet/1
+
+#查询--全量
+GET twitter/tweet/_search
+
+#查询--MUST
+GET twitter/tweet/_search
+{
+    "from": 0,
+    "size": 2,
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 1,
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "terms": {
+                        "no": [
+                            "0001",
+                            "0002"
+                        ],
+                        "boost": 1
+                    }
+                },
+                {
+                    "range": {
+                        "birthday": {
+                            "from": "2017-10-01 00:00:00",
+                            "to": "2017-10-30 00:00:00",
+                            "include_lower": true,
+                            "include_upper": true,
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "prefix": {
+                        "no": {
+                            "value": "00",
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "exists": {
+                        "field": "score",
+                        "boost": 1
+                    }
+                },
+                {
+                    "ids": {
+                        "values": [
+                            "1",
+                            "AV92qXhj4j_i4NJdSR_G"
+                        ],
+                        "boost": 1
+                    }
+                },
+                {
+                    "wildcard": {
+                        "remark": "g?od*"
+                    }
+                },
+                {
+                    "regexp": {
+                        "remark": "(.*)"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+#查询--MUST_NOT
+GET twitter/tweet/_search
+{
+    "query": {
+        "bool": {
+            "must_not": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 2,
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "term": {
+                        "no": {
+                            "value": "100",
+                            "boost": 1
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+#查询--SHOULD
+GET twitter/tweet/_search
+{
+    "query": {
+        "bool": {
+            "should": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 1,
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "exists": {
+                        "field": "score",
+                        "boost": 1
+                    }
+                }
+            ]
+        }
+    }
+}
+
+#查询--FILTER
+GET twitter/tweet/_search
+{
+    "from": 0,
+    "size": 2,
+    "query": {
+        "bool": {
+            "filter": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 1,
+                            "boost": 1
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+#查询--条件查询
+GET twitter/tweet/_search
+{
+    "from": 0,
+    "size": 20, 
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 1,
+                            "boost": 1
+                        }
+                    }
+                }
+            ],
+            "must_not": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 2,
+                            "boost": 1
+                        }
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "term": {
+                        "status": {
+                            "value": 1,
+                            "boost": 1
+                        }
+                    }
+                },
+                {
+                    "exists": {
+                        "field": "score",
+                        "boost": 1
+                    }
+                }
+            ]
+        }
+    }
+}
+
+#查询--分页/非全字段/排序
+GET twitter/tweet/_search
+{
+    "from": 0,
+    "size": 1,
+    "_source" : {
+      "includes" : [
+        "no",
+        "score"
+      ],
+      "excludes" : [ ]
+    },
+    "sort": [ 
+      { "age": { "order": "asc" }},
+      { "score": { "order": "desc" }}
+    ]
+}
+
+#查询--游标查询
+GET twitter/tweet/_search?scroll=1m
+{
+    "from": 0,
+    "size": 1
+}
+
+#查询--游标查询
+GET /_search/scroll
+{
+    "scroll": "1m", 
+    "scroll_id" : "DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAOwsFnlkZ2F6WG0tVFVpdVA0MjFSRmdHX1EAAAAAAADsJRYzTXpiX3hfV1J2bUFLZ3BNTXhqQzlB"
+}
+
+
+######################聚合操作#####################
+#聚合
+GET test/info/_search
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+  "bool" : {
+      "must": [
+          {
+            "term": {
+                "country": {
+                    "value": "中国",
+                    "boost": 1
+                }
+            }
+          }
+      ], 
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "aggregations" : {
+    "province-info" : {
+      "terms": {
+          "field": "province"
+         },
+       "aggs": {
+          "people_sum": {
+             "sum": {
+                "field": "people"
+             }
+          },
+          "age_avg": {
+             "avg": {
+                "field": "age"
+             }
+          }
+       }
+    }
+  },
+  "ext" : { }
+}
+
+#聚合--嵌套桶
+GET test/info/_search
+{
+  "from" : 0,
+  "size" : 10,
+  "query" : {
+  "bool" : {
+      "must": [
+          {
+            "term": {
+                "country": {
+                    "value": "中国",
+                    "boost": 1
+                }
+            }
+          }
+      ], 
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "aggregations" : {
+    "province-info" : {
+      "terms": {
+          "field": "province"
+         },
+      "aggs": {
+       "city-info": {
+         "terms": {
+          "field": "city"
+       },
+       "aggs": {
+          "people_sum": {
+             "sum": {
+                "field": "people"
+             }
+          },
+          "age_avg": {
+             "avg": {
+                "field": "age"
+             }
+          }
+        }
+      }
+     }
+    }
+  },
+  "ext" : { }
+}
+
+#聚合--过滤桶
+GET test/info/_search
+{
+  "from" : 0,
+  "size" : 1,
+  "query" : {
+  "bool" : {
+      "must": [
+          {
+            "term": {
+                "country": {
+                    "value": "中国",
+                    "boost": 1
+                }
+            }
+          }
+      ], 
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "aggregations" : {
+    "province-info" : {
+      "terms": {
+          "field": "province"
+         },
+       "aggs": {
+          "developing-province-info": {
+              "filter": {
+                  "term": {
+                    "developing": {
+                        "value": 1,
+                        "boost": 1
+                    }
+                  }
+               },
+              "aggs": {
+                "people_sum": {
+                   "sum": {
+                      "field": "people"
+                   }
+                },
+                "age_avg": {
+                   "avg": {
+                      "field": "age"
+                   }
+                }
+              }
+            }
+        }
+    }
+  },
+  "ext" : { }
+}
+
+#聚合--全局桶
+GET test/info/_search
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+  "bool" : {
+      "must": [
+          {
+            "term": {
+                "country": {
+                    "value": "中国",
+                    "boost": 1
+                }
+            }
+          },
+          {
+              "term": {
+                "developing": {
+                    "value": 1,
+                    "boost": 1
+                }
+              }
+           }
+      ], 
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "aggregations" : {
+    "province-info" : {
+      "terms": {
+          "field": "province"
+         },
+       "aggs": {
+          "people_sum": {
+             "sum": {
+                "field": "people"
+             }
+          },
+          "age_avg": {
+             "avg": {
+                "field": "age"
+             }
+          }
+       }
+    },
+    "china-info": {
+      "global" : {},
+      "aggs": {
+        "people_sum": {
+           "sum": {
+              "field": "people"
+           }
+        },
+        "age_avg": {
+           "avg": {
+              "field": "age"
+           }
+        }
+      }
+    }
+  },
+  "ext" : { }
+}
+
+#聚合--后过滤器
+GET test/info/_search
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+  "bool" : {
+      "must": [
+          {
+            "term": {
+                "country": {
+                    "value": "中国",
+                    "boost": 1
+                }
+            }
+          }
+      ], 
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "post_filter": {
+      "term": {
+        "developing": {
+            "value": 1,
+            "boost": 1
+        }
+      }
+   },
+  "aggregations" : {
+    "province-info" : {
+      "terms": {
+          "field": "province"
+         },
+       "aggs": {
+          "people_sum": {
+             "sum": {
+                "field": "people"
+             }
+          },
+          "age_avg": {
+             "avg": {
+                "field": "age"
+             }
+          }
+       }
+    }
+  },
+  "ext" : { }
+}
+
