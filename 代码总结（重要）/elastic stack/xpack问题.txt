@@ -1,0 +1,2 @@
+配置文件：xpack.security.enabled false
+或者 重新申请

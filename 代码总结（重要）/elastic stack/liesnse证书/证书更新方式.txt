@@ -1,0 +1,7 @@
+申请证书地址：https://www.elastic.co/subscriptions
+更新API地址：https://www.elastic.co/guide/en/elasticsearch/reference/6.x/update-license.html
+把证书放在对应请求文件地址下
+curl -XPUT -u elastic http://127.0.0.1:9200/_xpack/license?acknowledge=true -H "Content-Type: application/json" -d @*************-8ce0-46ee-886e-ab2d8d7ffd86-v5.json
+默认密码 可能是changme
+
+ 
