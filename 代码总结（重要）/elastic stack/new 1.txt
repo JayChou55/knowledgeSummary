@@ -1,0 +1,3 @@
+docker run –u 1000 -d --name es1 -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v /data1/elasticplugins:/usr/share/elasticsearch/plugins docker.elastic.co/elasticsearch/elasticsearch:6.1.1 
+
+docker run –u 1000 -d --name es1 -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v /data1/elasticplugins:/usr/share/elasticsearch/plugins docker.elastic
