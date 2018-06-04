@@ -1,6 +1,8 @@
 docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable
 docker run -d --name rancher -v /etc/localtime:/etc/localtime -v /opt/rancher/mysql:/var/lib/mysql --restart=unless-stopped -p 8081:8080 rancher/server:stable
 
+docker run -d --restart=unless-stopped -p 8081:8080 -p 9345:9345 rancher/server:lastest --db-host 47.100.101.233 --db-port 3306 --db-user root --db-pass 123456 --db-name cattle --advertise-address 47.100.101.233
+
 然后复制网页中代码到agent中
 
 添加应用==添加项目

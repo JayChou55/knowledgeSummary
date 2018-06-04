@@ -6,8 +6,14 @@
 由于我开启的容器是elasticsearch-5.6.4，安装了ik插件，修改配置重启时，起不来了，瘫痪了。正确的解决姿势是将容器的配置cp出来（到宿主机），修改正确然后cp回去，启动就行了。
 
 我的容器：es-node-1，容器配置路径：/usr/share/elasticsearch/config
-
+//就是tm的直接复制docker cp
 docker cp es-node-1:/usr/share/elasticsearch/config/elasticsearch.yml . #cp出来，到宿主机当前目录下
 vi elasticsearch.yml #修改配置
 docker cp elasticsearch.yml es-node-1:/usr/share/elasticsearch/config/elasticsearch.yml #cp回去
 docker start es-node-1 #重启
+
+
+docker run -d --name es1 -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticData:/usr/share/elasticsearch/data –v /data1/elasticPlugins:/usr/share/elasticsearch/plugins docker.elastic.co/elasticsearch/elasticsearch:6.1.1
+
+
+docker run -u 1000 -d --name es1 -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v /data1/elasticplugins:/usr/share/elasticsearch/plugins docker.elastic.co/elasticsearch/elasticsearch:6.1.1
