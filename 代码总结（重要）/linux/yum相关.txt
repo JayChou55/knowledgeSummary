@@ -1,0 +1,3 @@
+yum update 一半出错了
+解决：
+package-cleanup --cleandupes

@@ -1,0 +1,3 @@
+虚拟机安装后nat模式，要开启/etc/sysconfig/network-scripts/ifcfg-xxx
+onboot=no改为yes
+service network restart
