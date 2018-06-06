@@ -1,3 +1,51 @@
+#查看网络
+docker network ls 
+#新建或删除网络
+docker network create/docker network rm 
+#创建容器用--driver参数使用网络插件
+docker network create--driver=bridge br0
+# 不指定网络驱动时默认创建的bridge网络
+docker network create simple-network
+# 查看网络内部信息
+docker network inspect simple-network
+# 应用到容器时，可进入容器内部使用ifconfig查看容器的网络详情
+
+docker network create -d overlay multihost
+
+但是创建一个overlay网络就需要一些前提条件（具体操作请参考Docker容器网络相关内容）： 
+- key-value store（Engine支持Consul、Etcd和ZooKeeper等分布式存储的key-value store） 
+- 集群中所有主机已经连接到key-value store 
+- swarm集群中每个主机都配置了下面的daemon参数 
+- –cluster-store 
+- –cluster-store-opt 
+- –cluster-advertise 
+然后创建overlay网络：
+===========================================================
+第一个容器：只有默认的docker0
+第二个容器：属于两个网络——docker0、自定义网络
+第三个容器：只属于自定义网络
+
+
+# 创建三个容器 conTainer1,container2,container3
+docker run -itd --name=container1 busybox
+docker run -itd --name=container2 busybox
+# 创建网络mynet
+docker network create -d bridge --subnet 172.25.0.0/16 mynet
+# 将容器containerr2连接到新建网络mynet
+docker network connect mynet container2
+# 使用mynet网络来容器container3
+docker run --net=mynet --ip=172.25.3.3 -itd --name=container3 busybox
+
+# 查看这三个容器的网络情况
+docker network inspect container1 # docker0
+docker network inspect container2 # docker0, mynet
+docker network inspect container3 # mynet
+
+# 创建网络时，使用参数`-d`指定驱动类型为overlay
+docker network create -d overlay my-multihost-network
+
+
+
 docker0
 	172.17.42.1 255.255.0.0
 

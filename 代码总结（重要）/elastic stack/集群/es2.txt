@@ -1,0 +1,14 @@
+cluster.name: "mangues_es"
+#子节点名称
+node.name: node
+#不作为master节点
+node.master: false
+node.data: true
+
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+
+network.bind_host: 0.0.0.0
+network.publish_host: 192.168.0.107
+#设置master地址
+discovery.zen.ping.unicast.hosts: [192.168.0.164]

@@ -1,0 +1,7 @@
+docker run –u 1000 -d --name es1 -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v /data1/elasticplugins:/usr/share/elasticsearch/plugins docker.elastic.co/elasticsearch/elasticsearch:6.1.1 
+
+docker run  -d --name es1 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" -p 9200:9200 -p 9300:9300 -v /data1/elastic/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v /data1/elasticplugins:/usr/share/elasticsearch/plugins docker.elastic.co/elasticsearch/elasticsearch:6.1.1 
+
+-e "http.host=0.0.0.0" -e "transport.host=127.0.0.1"
+
+docker run  -d --name es1 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" -p 9200:9200 -p 9300:9300 --link es1:es1 -v /data1/elastic/es2.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data1/elasticdata:/usr/share/elasticsearch/data -v  docker.elastic.co/elasticsearch/elasticsearch:6.1.1 

@@ -4,8 +4,39 @@ network.host: 0.0.0.0
 # minimum_master_nodes need to be explicitly set when bound on a public IP
 # set to 1 to allow single node clusters
 # Details: https://github.com/elastic/elasticsearch/pull/17288
+#设置这个参数来保证集群中的节点可以知道其它N个有master资格的节点。默认为1，对于大的集群来说，可以设置大一点的值（2-4）
 discovery.zen.minimum_master_nodes: 1
 xpack.license.self_generated.type: basic
 http.cors.enabled: true
 http.cors.allow-origin: "*"
+
+
+
+
+
+
+
+
+
+
+=====================================
+
+cluster.name: "docker_es"
+#本节点名称
+node.name: master
+##作为master节点
+node.master: true
+##是否存储数据
+node.data: true
+## head插件设置
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+##设置可以访问的ip 这里全部设置通过
+network.bind_host: 0.0.0.0
+##设置节点 访问的地址 设置master所在机器的ip
+network.publish_host: 121.43.189.172
+#xpack.security.enabled: false
+transport.host: '127.0.0.1'
+xpack.license.self_generated.type: basic
+
 
