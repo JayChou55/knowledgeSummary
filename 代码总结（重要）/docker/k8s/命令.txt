@@ -1,0 +1,12 @@
+#查看集群状态
+kubectl cluster-info
+#创建
+kubectl create -f pod_nginx.yml
+#删除
+kubectl delete -f pod_nginx.yml
+#查看
+kubectl get pods
+#查看详细
+kubectl get pods -o wide
+#映射
+kubectl port-forward nginx 8080:80
